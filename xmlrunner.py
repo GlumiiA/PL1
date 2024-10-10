@@ -11,10 +11,10 @@ import time
 import codecs
 try:
     from unittest2.runner import TextTestRunner
-    from unittest2.runner import TextTestResult as _TextTestResult
+    from unittest2.runner import TextTestResult
     from unittest2.result import TestResult
 except ImportError:
-    from unittest import TestResult, _TextTestResult, TextTestRunner
+    from unittest import TestResult, TextTestResult, TextTestRunner
 
 try:
     # Removed in Python 3
@@ -104,7 +104,7 @@ class _TestInfo(object):
         return self.test_exception_info
 
 
-class _XMLTestResult(_TextTestResult):
+class _XMLTestResult(TextTestResult):
     """
     A test result class that can express test results in a XML report.
 
@@ -112,7 +112,7 @@ class _XMLTestResult(_TextTestResult):
     """
     def __init__(self, stream=sys.stderr, descriptions=1, verbosity=1,
                  elapsed_times=True):
-        _TextTestResult.__init__(self, stream, descriptions, verbosity)
+        TextTestResult.__init__(self, stream, descriptions, verbosity)
         self.successes = []
         self.callback = None
         self.elapsed_times = elapsed_times
@@ -159,7 +159,7 @@ class _XMLTestResult(_TextTestResult):
         """
         Called after execute each test method.
         """
-        _TextTestResult.stopTest(self, test)
+        TextTestResult.stopTest(self, test)
         self.stop_time = time.time()
 
         if self.callback and callable(self.callback):
