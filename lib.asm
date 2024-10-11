@@ -34,9 +34,9 @@ print_string:
 
 ; Принимает код символа и выводит его в stdout
 print_char:
-    push rdi     
-    mov rsi, rsp        
+    push rdi
     mov rdx, 1
+    mov rsi, rsp        
     mov rax, 1 ; write
     mov rdi, 1   ; stdout 
     syscall
