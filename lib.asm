@@ -114,11 +114,10 @@ string_equals:
     cmp rdx, rcx
     jne .not_equal 
     .equal_loop:
-        mov al, byte [rdi]      ; Загружаем байт из первой строки
-        mov bl, byte [rsi]      ; Загружаем байт из второй строки
-        cmp al, bl
+        mov r0b, byte [rdi]
+        cmp r0b, byte [rsi]   
         jne .not_equal 
-        test al, al       
+        test r0b, r0b       
         jz .equal            
         inc rdi                 
         inc rsi                 
