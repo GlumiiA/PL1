@@ -111,7 +111,7 @@ string_equals:
     call string_length 
     mov rcx, rax ; длина 2ой строки
     pop rdi
-    pop r
+    pop rsi
     xor rax, rax 
     cmp rdx, rcx
     jne .not_equal 
