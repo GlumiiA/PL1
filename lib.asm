@@ -62,7 +62,7 @@ print_uint:
     push rdi          
     mov rax, rdi 
     mov rcx, 10 ; делитель
-    sub rsp, 32 
+    sub rsp, 40 
     mov rbx, rsp   
     mov rsi, 0 
     .loop:
@@ -78,7 +78,7 @@ print_uint:
         mov rdi, rbx 
         mov rsi, rsi 
         call print_string
-        add rsp, 32
+        add rsp, 40
         pop rdi 
         pop rbx
         ret
@@ -86,6 +86,7 @@ print_uint:
  
 ; Выводит знаковое 8-байтовое число в десятичном формате 
 print_int: 
+	sub rsp, 8
     mov rax, rdi    
     jge .positiv 
     push rax
@@ -97,6 +98,7 @@ print_int:
     neg rax
     .positiv:
         call print_uint
+	add rsp, 8
         ret
 
 
@@ -158,9 +160,11 @@ read_word:
     mov rbx, rsi
 ;    mov rcx, 0
     test rbx, rsi
-    jz .word_biger
+    jz .word_bigger
     .loop_spaces:
-        call read_char      
+	sub rsp, 8
+        call read_char
+	add rsp, 8      
         cmp rax, 0x0          
         je .end
         cmp rax, 0x20
@@ -171,7 +175,7 @@ read_word:
         je .loop_spaces
         dec rbx
         cmp rbx, 0          ; проверяем, не превышен ли размер буфера
-        jbe .word_biger
+        jbe .word_bigger
         mov [rdi + rcx], al
         inc rcx ; Увеличиваем длину слова
         jmp .loop_spaces
@@ -179,14 +183,14 @@ read_word:
     .end:
         dec rbx
         cmp rbx, 0          ; проверяем, не превышен ли размер буфера
-        jbe .word_biger
+        jbe .word_bigger
         mov byte [rdi + rcx], 0   ; Добавляем нуль-терминатор
         mov rdx, rcx         ; rdx = длина слова
         mov rax, rdi       
         pop rsi
         pop rdi
         ret
-    .word_biger:
+    .word_bigger:
         xor rax, rax          ; Ошибка: установка rax в 0
         pop rsi
         pop rdi
@@ -199,6 +203,7 @@ read_word:
 ; Возвращает в rax: число, rdx : его длину в символах
 ; rdx = 0 если число прочитать не удалось
 parse_uint:
+	push rbx
     xor rax, rax
     xor rdx, rdx
     .loop_digit:
@@ -217,6 +222,7 @@ parse_uint:
         jmp .loop_digit    
     .end:
         xor rax, rdx
+	pop rbx
         ret 
 
 
@@ -241,7 +247,9 @@ parse_int:
         cmp byte [rcx], '+'   
         je .positive        
     .do_positiv:
+	sub rsp, 8
         call parse_uint
+	add rsp, 8
         test rdx, rdx          ; Проверяем, было ли прочитано число
         jz .end              
         cmp r8, 1    ; Проверяем, есть ли знак
