@@ -74,7 +74,7 @@ print_uint:
         dec rcx
         mov [rcx], dl
         test rax, rax
-        .loop_div
+        jnz .loop_div
     .print
         mov rsi, rcx             ;  начало строки
         mov rdi, rbx             ; Количество символов 
