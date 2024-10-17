@@ -63,17 +63,17 @@ print_uint:
     mov rax, rdi 
     mov rcx, 10 ; делитель
     sub rsp, 40 
-    mov rbx, rsp   
-    mov rsi, 0 
+    mov rbx, 0   
+    mov rsi, 1 
     .loop:
         xor rdx, rdx
         div rcx
         add dl, '0' ; Переводим остаток в ASCII
-        mov [rbx + rsi], dl 
+        mov [rbx - rsi], dl 
         inc rsi 
         cmp rax, 0
         jnz .loop
-        mov byte [rbx + rsi], 0
+        mov byte [rbx - rsi], 0
     .outRes:
         mov rdi, rbx 
         mov rsi, rsi 
@@ -86,8 +86,9 @@ print_uint:
  
 ; Выводит знаковое 8-байтовое число в десятичном формате 
 print_int: 
-	sub rsp, 8
-    mov rax, rdi    
+    sub rsp, 8
+    mov rax, rdi   
+    cmp rax, rax 
     jge .positiv 
     push rax
     push rdi
