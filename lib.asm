@@ -58,38 +58,37 @@ print_newline:
 ; Совет: выделите место в стеке и храните там результаты деления
 ; Не забудьте перевести цифры в их ASCII коды.
 print_uint:
-    push rbx 
-    push rcx
-    push rdx          
-    mov rax, rdi 
-    mov rbx, 10 ; делитель
-    dec rsp
-    mov byte [rsp], 0
-    sub rsp, 32 
-    xor rcx, rcx   ; счётчик символов
-    .loop1:
+    xor rbx, rbx
+    mov rcx, rsp
+    sub rsp, 40
+    mov rax, rdi
+    dec rcx                   
+    mov [rcx], 0  
+    cmp rax, 0 
+    jz .print_zero
+    .loop
         xor rdx, rdx
+        mov rbx, 10
         div rbx
-        add dl, '0' ; Переводим остаток в ASCII
-        push rdx
-        inc rcx
-        cmp rax, 0
-        jnz .loop1
-    .loop2:
-        pop rdx
-        mov [rdi], dl
-        inc di
-        loop .loop2
-    .outRes:
-        mov rdi, rcx 
-        push rdi
-        call print_string
-        pop rdi
-        add rsp, 32
-        pop rdx
-        pop rcx 
-        pop rbx
+        add dl, '0'
+        dec rcx
+        mov [rcx], dl
+        test rax, rax
+        .loop
+    .print
+        mov rsi, rcx             ;  начало строки
+        mov rdi, rbx             ; Количество символов 
+        call print_string        
+        add rsp, 40            ; Освобождаем стек
+    .print_zero
+        mov byte [rsp-1], '0'    ; Помещаем '0' на стек
+        dec rsp                   ; Уменьшаем указатель
+        mov rsi, rsp             ; Строка с '0'
+        mov rdi, 1               ; Длина строки = 1
+        call print_string        ; Печатаем '0'
+        add rsp, 40              ; Освобождаем стек
         ret
+
 
  
 ; Выводит знаковое 8-байтовое число в десятичном формате 
