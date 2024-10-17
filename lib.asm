@@ -66,7 +66,7 @@ print_uint:
     mov [rcx], 0  
     cmp rax, 0 
     jz .print_zero
-    .loop
+    .loop_div
         xor rdx, rdx
         mov rbx, 10
         div rbx
@@ -74,7 +74,7 @@ print_uint:
         dec rcx
         mov [rcx], dl
         test rax, rax
-        .loop
+        .loop_div
     .print
         mov rsi, rcx             ;  начало строки
         mov rdi, rbx             ; Количество символов 
