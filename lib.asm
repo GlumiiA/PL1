@@ -59,27 +59,35 @@ print_newline:
 ; Не забудьте перевести цифры в их ASCII коды.
 print_uint:
     push rbx 
-    push rdi          
+    push rcx
+    push rdx          
     mov rax, rdi 
-    mov rcx, 10 ; делитель
-    sub rsp, 40 
-    mov rbx, 0   
-    mov rsi, 1 
-    .loop:
+    mov rbx, 10 ; делитель
+    dec rsp
+    mov byte [rsp], 0
+    sub rsp, 32 
+    xor rcx, rcx   ; счётчик символов
+    .loop1:
         xor rdx, rdx
-        div rcx
+        div rbx
         add dl, '0' ; Переводим остаток в ASCII
-        mov [rbx - rsi], dl 
-        inc rsi 
+        push rdx
+        inc rcx
         cmp rax, 0
-        jnz .loop
-        mov byte [rbx - rsi], 0
+        jnz .loop1
+    .loop2:
+        pop rdx
+        mov [rdi], dl
+        inc di
+        loop .loop2
     .outRes:
-        mov rdi, rbx 
-        mov rsi, rsi 
+        mov rdi, rcx 
+        push rdi
         call print_string
-        add rsp, 40
-        pop rdi 
+        pop rdi
+        add rsp, 32
+        pop rdx
+        pop rcx 
         pop rbx
         ret
 
