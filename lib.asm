@@ -75,15 +75,13 @@ print_uint:
         jnz .loopDiv
     .outRes:
         push rdi ; 16
-        sub rsi, rcx   ; Добавляем значения rcx к rsi
-        add rsi, 38
+        add rsi, rcx   ; Добавляем значения rcx к rsi
         mov rdi, rsi   ; передает указатель на строку
         call print_string
         pop rdi
         add rsp, 40
         pop rbx
         ret
-
  
 ; Выводит знаковое 8-байтовое число в десятичном формате 
 print_int: 
