@@ -57,29 +57,29 @@ print_newline:
 ; Выводит беззнаковое 8-байтовое число в десятичном формате 
 ; Совет: выделите место в стеке и храните там результаты деления
 ; Не забудьте перевести цифры в их ASCII коды.
-print_uint:
-    push rbx 
-    push rdi          
+print_uint: 
+    push rbx  ; 16      
     mov rax, rdi 
-    mov rcx, 10 ; делитель
-    sub rsp, 40 
-    mov rbx, rsp   
-    mov rsi, 32 
-    .loop:
+    mov rbx, 10 ; делитель
+    dec rsp ; указатель на нуль-терминированную строку
+    mov byte [rsp], 0
+    sub rsp, 39   ; выделим место в стеке
+    xor rcx, rcx   ; счётчик символов
+    .loopDiv:
         xor rdx, rdx
-        div rcx
+        div rbx : делим на rbx
         add dl, '0' ; Переводим остаток в ASCII
-        mov [rbx + rsi], dl 
-        dec rsi 
+        mov [rsз], dl ; сохраняем остаток о деления
+        inc rsp;
+        inc rcx ; увеличиваем   счётчик
         cmp rax, 0
-        jnz .loop
-        mov byte [rbx + rsi], 0
+        jnz .loopDiv
     .outRes:
-        mov rdi, rbx 
-        mov rsi, rsi 
+        push rdi ; 16
+        mov rdi, rcx ; передает указатель на строку
         call print_string
+        pop rdi
         add rsp, 40
-        pop rdi 
         pop rbx
         ret
 
