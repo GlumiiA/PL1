@@ -67,7 +67,7 @@ print_uint:
     xor rcx, rcx   ; счётчик символов
     .loopDiv:
         xor rdx, rdx
-        div rbx : делим на rbx
+        div rbx ; делим на rbx
         add dl, '0' ; Переводим остаток в ASCII
         mov [rsз], dl ; сохраняем остаток о деления
         inc rsp;
