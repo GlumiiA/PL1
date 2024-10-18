@@ -69,13 +69,13 @@ print_uint:
         div rbx ; делим на rbx
         add dl, '0' ; Переводим остаток в ASCII
         lea rdi, [rsi + 39 - rcx] ; Вычисляем адрес для записи 
-        mov [rdi], dl ; сохраняем остаток о деления
+        mov byte [rdi], dl ; сохраняем остаток о деления
         inc rcx ; увеличиваем   счётчик
         test rax, rax
         jnz .loopDiv
     .outRes:
         lea rdi, [rsi + 39 - rcx] ; Вычисляем адрес для записи 
-        mov [rdi], 0 ; указатель на нуль-терминированную строку
+        mov byte [rdi], 0 ; указатель на нуль-терминированную строку
         push rdi ; 16
         add rsp, rcx   ; Добавляем значения rcx к rsp
         mov rdi, rsi   ; передает указатель на строку
