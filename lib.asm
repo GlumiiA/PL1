@@ -61,23 +61,22 @@ print_uint:
     push rbx  ; 16      
     mov rax, rdi 
     mov rbx, 10 ; делитель
-    dec rsp ; указатель на нуль-терминированную строку
+    sub rsp, 40   ; выделим место в стеке
     mov rsi, rsp ; сохраняем указатель на строку
-    mov byte [rsp], 0
-    sub rsp, 39   ; выделим место в стеке
+    mov byte [rsi + 39], 0 ; указатель на нуль-терминированную строку
     xor rcx, rcx   ; счётчик символов
     .loopDiv:
         xor rdx, rdx
         div rbx ; делим на rbx
         add dl, '0' ; Переводим остаток в ASCII
-        mov [rsi], dl ; сохраняем остаток о деления
-        dec rsi;
+        mov [rsi + 38 - rcx], dl ; сохраняем остаток о деления
         inc rcx ; увеличиваем   счётчик
         test rax, rax
         jnz .loopDiv
     .outRes:
         push rdi ; 16
-        add rsi, rcx   ; Добавляем значения rcx к rsi
+        sub rsi, rcx   ; Добавляем значения rcx к rsi
+        add rsi, 38
         mov rdi, rsi   ; передает указатель на строку
         call print_string
         pop rdi
