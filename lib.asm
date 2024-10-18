@@ -57,44 +57,32 @@ print_newline:
 ; Выводит беззнаковое 8-байтовое число в десятичном формате 
 ; Совет: выделите место в стеке и храните там результаты деления
 ; Не забудьте перевести цифры в их ASCII коды.
-print_uint:
-    xor rbx, rbx                ; Обнуляем счетчик символов
-    mov rcx, rsp                ; Указатель на начало места в стеке
-    sub rsp, 40                 ; Выделяем место в стеке (40 байт для строки)
-    mov rax, rdi                ; Перемещаем число в rax
-    dec rcx                      ; Подготовим место для нуль-терминатора
-    mov byte [rcx], 0           ; Нуль-терминатор
-
-    cmp rax, 0                   ; Проверяем, равно ли число 0
-    jz .print_zero               ; Если 0, переходим к печати
-
-.loop:
-    xor rdx, rdx                 ; Обнуляем rdx перед делением
-    mov rbx, 10                  ; Делитель 10
-    div rbx                       ; Делим rax на 10
-    add dl, '0'                  ; Преобразуем остаток в ASCII
-    dec rcx                      ; Двигаемся назад по стеку
-    mov [rcx], dl                ; Сохраняем символ в стек
-    inc rbx                      ; Увеличиваем счетчик символов
-    test rax, rax                ; Проверяем, не стало ли число 0
-    jnz .loop                    ; Если не 0, продолжаем петлю
-
-.print:
-    mov rsi, rcx                 ; Указатель на начало строки
-    mov rdi, rbx                 ; Длина строки
-    call print_string            ; Вызываем функцию для печати строки
-    add rsp, 40                  ; Освобождаем стек
-    ret
-
-.print_zero:
-    mov byte [rsp-1], '0'        ; Помещаем '0' на стек
-    dec rsp                       ; Уменьшаем указатель
-    mov rsi, rsp                 ; Указываем на строку с '0'
-    mov rdi, 1                   ; Длина строки = 1
-    call print_string            ; Печатаем '0'
-    add rsp, 40                  ; Освобождаем стек
-    ret
-
+print_uint: 
+    push rbx  ; 16      
+    mov rax, rdi 
+    mov rbx, 10 ; делитель
+    dec rsp ; указатель на нуль-терминированную строку
+    mov rsi, rsp
+    mov byte [rsp], 0
+    sub rsp, 40   ; выделим место в стеке
+    xor rcx, rcx   ; счётчик символов
+    .loopDiv:
+        xor rdx, rdx
+        div rbx : делим на rbx
+        add dl, '0' ; Переводим остаток в ASCII
+        mov [rsi], dl ; сохраняем остаток о деления
+        dec rsi
+        inc rcx ; увеличиваем   счётчик
+        cmp rax, 0
+        jnz .loopDiv
+    .outRes:
+        push rdi ; 16
+        mov rdi, rcx ; передает указатель на строку
+        call print_string
+        pop rdi
+        add rsp, 40
+        pop rbx
+        ret
 
  
 ; Выводит знаковое 8-байтовое число в десятичном формате 
