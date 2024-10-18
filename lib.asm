@@ -58,36 +58,42 @@ print_newline:
 ; Совет: выделите место в стеке и храните там результаты деления
 ; Не забудьте перевести цифры в их ASCII коды.
 print_uint:
-    xor rbx, rbx
-    mov rcx, rsp
-    sub rsp, 40
-    mov rax, rdi
-    dec rcx                   
-    mov [rcx], 0  
-    cmp rax, 0 
-    jz .print_zero
-    .loop_div
-        xor rdx, rdx
-        mov rbx, 10
-        div rbx
-        add dl, '0'
-        dec rcx
-        mov [rcx], dl
-        test rax, rax
-        jnz .loop_div
-    .print
-        mov rsi, rcx             ;  начало строки
-        mov rdi, rbx             ; Количество символов 
-        call print_string        
-        add rsp, 40            ; Освобождаем стек
-    .print_zero
-        mov byte [rsp-1], '0'    ; Помещаем '0' на стек
-        dec rsp                   ; Уменьшаем указатель
-        mov rsi, rsp             ; Строка с '0'
-        mov rdi, 1               ; Длина строки = 1
-        call print_string        ; Печатаем '0'
-        add rsp, 40              ; Освобождаем стек
-        ret
+    xor rbx, rbx                ; Обнуляем счетчик символов
+    mov rcx, rsp                ; Указатель на начало места в стеке
+    sub rsp, 40                 ; Выделяем место в стеке (40 байт для строки)
+    mov rax, rdi                ; Перемещаем число в rax
+    dec rcx                      ; Подготовим место для нуль-терминатора
+    mov byte [rcx], 0           ; Нуль-терминатор
+
+    cmp rax, 0                   ; Проверяем, равно ли число 0
+    jz .print_zero               ; Если 0, переходим к печати
+
+.loop:
+    xor rdx, rdx                 ; Обнуляем rdx перед делением
+    mov rbx, 10                  ; Делитель 10
+    div rbx                       ; Делим rax на 10
+    add dl, '0'                  ; Преобразуем остаток в ASCII
+    dec rcx                      ; Двигаемся назад по стеку
+    mov [rcx], dl                ; Сохраняем символ в стек
+    inc rbx                      ; Увеличиваем счетчик символов
+    test rax, rax                ; Проверяем, не стало ли число 0
+    jnz .loop                    ; Если не 0, продолжаем петлю
+
+.print:
+    mov rsi, rcx                 ; Указатель на начало строки
+    mov rdi, rbx                 ; Длина строки
+    call print_string            ; Вызываем функцию для печати строки
+    add rsp, 40                  ; Освобождаем стек
+    ret
+
+.print_zero:
+    mov byte [rsp-1], '0'        ; Помещаем '0' на стек
+    dec rsp                       ; Уменьшаем указатель
+    mov rsi, rsp                 ; Указываем на строку с '0'
+    mov rdi, 1                   ; Длина строки = 1
+    call print_string            ; Печатаем '0'
+    add rsp, 40                  ; Освобождаем стек
+    ret
 
 
  
