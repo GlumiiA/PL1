@@ -73,11 +73,12 @@ print_uint:
         mov [rsi], dl ; сохраняем остаток о деления
         dec rsi;
         inc rcx ; увеличиваем   счётчик
-        cmp rax, 0
+        test rax, rax
         jnz .loopDiv
     .outRes:
         push rdi ; 16
-        lea rdi, [rsi + rcx] ; передает указатель на строку
+        add rsi, rcx   ; Добавляем значения rcx к rsi
+        mov rdi, rsi   ; передает указатель на строку
         call print_string
         pop rdi
         add rsp, 40
