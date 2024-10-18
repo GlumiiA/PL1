@@ -69,7 +69,7 @@ print_uint:
         xor rdx, rdx
         div rbx ; делим на rbx
         add dl, '0' ; Переводим остаток в ASCII
-        mov [rsз], dl ; сохраняем остаток о деления
+        mov [rsp], dl ; сохраняем остаток о деления
         inc rsp;
         inc rcx ; увеличиваем   счётчик
         cmp rax, 0
