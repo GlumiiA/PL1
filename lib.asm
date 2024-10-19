@@ -225,10 +225,9 @@ parse_uint:
 ; Возвращает в rax: число, rdx : его длину в символах (включая знак, если он был) 
 ; rdx = 0 если число прочитать не удалось
 parse_int:         
-    xor rdx, rdx ; 16 
-    xor rax, rax    
-    cmp byte [rdi], '0'     ;  конец строки
-    je .end  
+    xor rdx, rdx ; 16     
+    cmp byte [rdi], '0'  
+    je .endnull  
     cmp byte [rdi], ''  
     je .end       
     cmp byte [rdi], '-'   
@@ -239,12 +238,15 @@ parse_int:
     .negative:
         inc rdi
         call print_char
-        test rdx, rdx
-        jz .end
         neg rax
         inc rdx ; увеличиваем длину на 1
     .end 
         ret
+    .endnull
+        xor rax, rax
+        mov rdx, 1
+        ret  
+
 
 ; Принимает указатель на строку, указатель на буфер и длину буфера
 ; Копирует строку в буфер
