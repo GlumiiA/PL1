@@ -196,13 +196,14 @@ parse_uint:
    xor r10, r10
    mov r9, 10    
    .loop:
-   mov r10b, byte [rdi + r8]
+   mov r10b, byte [rdi]
    sub r10b, '0'  
    cmp r10b, 0
    jl .end 
    mul r9
    add rax, r10
    inc rdx
+   inc rdi
    jmp .loop
  .end:
   ret
