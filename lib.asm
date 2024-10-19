@@ -240,6 +240,8 @@ parse_int:
         sub rsp, 8 ; 16
         call print_uint
         add rsp, 8
+        test rdx, rdx
+        jz .err
         neg rax
         inc rdx ; увеличиваем длину на 1
     .end 
@@ -248,6 +250,9 @@ parse_int:
         xor rax, rax
         mov rdx, 1
         ret  
+    .err
+        xor rdx, rdx
+        ret
 
 
 ; Принимает указатель на строку, указатель на буфер и длину буфера
