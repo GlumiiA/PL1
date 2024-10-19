@@ -215,10 +215,10 @@ parse_uint:
         ja .end ; если больше '9', выходим 
         ; Умножим текущее значение на 10
         ; rax * 10 = (rax << 1) + (rax << 3)
-        shl rax, 1         ; Умножаем на 2
-        add rax, rax       ; Умножаем на 4
-        add rax, rax       ; Умножаем на 8
-        add rax, al        ; Теперь добавляем текущую цифру       
+        shl rax, 1 ; Умножаем на 2
+        add rax, rax ; Умножаем на 4
+        add rax, rax ; Умножаем на 8
+        add rax, rax       
         inc  rdx             
         inc  rdi             
         jmp .loop_digit    
