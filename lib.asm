@@ -226,7 +226,7 @@ parse_uint:
         ; shl rbx, 1 ; Умножаем на 2
         ; add rax, rbx 
         add al, bl        ; Теперь добавляем текущую цифру 
-        cmp al, '9'       
+        sub al, '0'    
         inc  rdx             
         inc  rdi             
         jmp .loop_digit    
