@@ -226,21 +226,20 @@ parse_uint:
 ; rdx = 0 если число прочитать не удалось
 parse_int:         
     xor rdx, rdx ; 16     
-    .skip_spaces:
-        cmp byte [rdi], ' '  ; символ пробел
-        je .skip_spaces       ; 
-        cmp byte [rdi], 0     ;  конец строки
-        je .end  
-        cmp byte [rdi], ''  
-        je .end       
-        cmp byte [rdi], '-'   
-        je .negative     
+    cmp byte [rdi], 0     ;  конец строки
+    je .end  
+    cmp byte [rdi], ''  
+    je .end       
+    cmp byte [rdi], '-'   
+    je .negative     
     .positive:
         call parse_uint
         jmp .end             
     .negative:
         inc rdi
         call print_char
+        test rdx, rdx
+        jz .end
         neg rax
         inc rdx ; увеличиваем длину на 1
     .end 
