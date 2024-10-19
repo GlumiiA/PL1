@@ -224,35 +224,33 @@ parse_uint:
 ; Если есть знак, пробелы между ним и числом не разрешены.
 ; Возвращает в rax: число, rdx : его длину в символах (включая знак, если он был) 
 ; rdx = 0 если число прочитать не удалось
-parse_int:         
-    xor rdx, rdx ;   
-    cmp byte [rdi], 0     ;  конец строки
-    je .endnull     
-    cmp byte [rdi], '-'   
-    je .negative     
-    .positive:
-        sub rsp, 8 ; 16
-        call parse_uint
-        add rsp, 8
-        jmp .end             
-    .negative:
-        inc rdi
-        sub rsp, 8 ; 16
-        call print_uint
-        add rsp, 8
-        test rdx, rdx
-        jz .err
-        neg rax
-        inc rdx ; увеличиваем длину на 1
-    .end 
-        ret
-    .endnull
-        xor rax, rax
-        mov rdx, 1
-        ret  
-    .err
-        xor rdx, rdx
-        ret
+parse_int:
+    xor rax, rax
+    ret 
+    sub rsp, 8  ; Уважаем конвенцию (предполагается что она соблюдена везде и перед вызовом функции стек был выронен по 16)
+    ; Если чисто отрицательно переходим в состояние minus
+    mov al, byte[rdi]
+    cmp al, '-'
+    je .minus
+    ; Раз число >= 0 то читаем как беззнаково и выходим
+    call parse_uint
+    jmp .ret
+ .minus:
+    ; Увеличили перевели указатель на символ после минуса и парсим беззнаковое число
+    inc rdi
+    call parse_uint
+    ; Если потерпели неудачу то переходим в состояние fail
+    test rdx, rdx
+    jz .fail
+    ; Инвертируем считанное число и добавляем один к динне (учёт минуса)
+    neg rax
+    inc rdx
+    jmp .ret
+ .fail:
+    xor rdx, rdx
+ .ret:
+    add rsp, 8
+    ret
 
 
 ; Принимает указатель на строку, указатель на буфер и длину буфера
