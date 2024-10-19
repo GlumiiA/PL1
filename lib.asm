@@ -235,13 +235,13 @@ parse_int:
     .positive:
         sub rsp, 8 ; 16
         call parse_uint
-        pop rsp, 8
+        add rsp, 8
         jmp .end             
     .negative:
         inc rdi
         sub rsp, 8 ; 16
         call print_char
-        pop rsp, 8
+        add rsp, 8
         neg rax
         inc rdx ; увеличиваем длину на 1
     .end 
