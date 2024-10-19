@@ -266,7 +266,7 @@ string_copy:
     inc rdi
     inc rsi
     ; Если пришли в нуль-терминатор переходи в состояние completed
-    cmp r10b, NULL_TERMINATOR
+    cmp r10b, 0
     je .completed
     ; Если места в буфере больше нет то в состояние overflow
     cmp rdx, rax
