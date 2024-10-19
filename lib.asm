@@ -194,6 +194,7 @@ parse_uint:
    xor rax, rax    
    xor r9, r9      ; счётчик
    xor r10, r10    ; для хранения числа
+   xor r8, r8
    .loop_digit:
         mov r10b, byte [rdi + r9] ; байт из строки   
         sub r10b, '0' 
@@ -201,13 +202,17 @@ parse_uint:
         jl .end    
         cmp r10b, 9
         jg .end
+
         mov r8, rax
         ; Умножим текущее значение на 10
         ; rax * 10 = (rax << 1) + (rax << 3)
-        push rbx
+        push rdx
         shl rax, 3 ; Умножаем  на 8
-        mov rbx, r8 ; Загружаем rax(до *) в rbx
+        mov rdx, r8 ; Загружаем rax(до *) в rbx
         shl rbx, 1 ; Умножаем на 2
+        add rax, rdx 
+        pop rdx
+        
         add rax, r10
         inc r9
         jmp .loop_digit
