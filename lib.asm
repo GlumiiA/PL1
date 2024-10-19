@@ -191,32 +191,28 @@ read_word:
 ; Возвращает в rax: число, rdx : его длину в символах
 ; rdx = 0 если число прочитать не удалось
 parse_uint:
-   xor rax, rax    
-   xor r9, r9      ; счётчик
-   xor r10, r10    ; для хранения числа
-   .loop_digit:
-        mov r10b, byte [rdi + r9] ; байт из строки   
-        sub r10b, '0' 
-        cmp r10b, 0 
-        jl .end    
-        cmp r10b, 9
-        jg .end
+    xor rax, rax       ; Обнуляем rax для хранения числа
+    xor rdx, rdx       ; Обнуляем rdx для длины строки
+    xor r9, r9         ; Счетчик символов
+.loop_digit:
+    mov r10b, byte [rdi + r9]  ; Получаем текущий символ из строки
+    cmp r10b, 0                 ; Проверяем конец строки
+    je .end                     ; Если нулевой байт, выходим из цикла
+    sub r10b, '0'               ; Преобразуем символ в число
+    cmp r10b, 9                 ; Проверяем, не больше ли 9
+    ja .end                     ; Если больше 9, выходим
+    ; Умножаем текущее значение на 10
+    mov rdx, rax                ; Сохраняем текущее значение rax
+    shl rax, 3                  ; Умножаем на 8 (left shift на 3)
+    shl rdx, 1                  ; Умножаем на 2 (left shift на 1)
+    add rax, rdx                ; rax = rax * 10
 
-        ; Умножим текущее значение на 10
-        ; rax * 10 = (rax << 1) + (rax << 3)
-        push rdx
-        mov rdx, rax 
-        shl rax, 3 ; Умножаем  на 8
-        shl rbx, 1 ; Умножаем на 2
-        add rax, rdx 
-        pop rdx
-
-        add rax, r10
-        inc r9
-        jmp .loop_digit
-    .end:
-        mov rdx, r9
-        ret
+    add rax, r10b               ; Добавляем текущую цифру
+    inc r9                      ; Увеличиваем счетчик
+    jmp .loop_digit             ; Переходим к следующему символу
+.end:
+    mov rdx, r9                 ; Сохраняем количество прочитанных символов в rdx
+    ret
 
 ; Принимает указатель на строку, пытается
 ; прочитать из её начала знаковое число.
