@@ -206,6 +206,7 @@ parse_uint:
     push rbx
     xor rax, rax
     xor rdx, rdx ; счётчик
+    xor rbx, rbx ; для хранения тек символа
     xor r10, r10 ; для хранения rax
     .loop_digit:
         mov al, byte [rdi] ; байт из строки
@@ -215,7 +216,6 @@ parse_uint:
         jl .end 
         cmp al, '9' 
         jg .end ; если больше '9', выходим 
-        sub al, '0' ; преобразование ASCII в число
         push rdx
         mov rdx, 10
         mul rdx
@@ -228,6 +228,7 @@ parse_uint:
         ; mov rbx, r10 ; Загружаем rax(до *) в rbx
         ; shl rbx, 1 ; Умножаем на 2
         ; add rax, rbx 
+        sub al, '0' ; преобразование ASCII в число
         add rax, rbx        ; Теперь добавляем текущую цифру       
         inc  rdx             
         inc  rdi             
