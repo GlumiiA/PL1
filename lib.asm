@@ -220,7 +220,13 @@ parse_uint:
         inc rdi
         jmp .loop_digit
     .end:
-        ret 
+        test rdx, rdx
+        jne .end2
+        ret
+    .end2
+        mov rax, o
+        mov rdx, 0
+        ret
 
 
 
