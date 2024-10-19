@@ -226,8 +226,8 @@ parse_uint:
 ; rdx = 0 если число прочитать не удалось
 parse_int:         
     xor rdx, rdx ; 16 
-    mov rax, 0   
-    cmp byte [rdi], 0     ;  конец строки
+    xor rax, rax    
+    cmp byte [rdi], '0'     ;  конец строки
     je .end  
     cmp byte [rdi], ''  
     je .end       
