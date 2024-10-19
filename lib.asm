@@ -107,15 +107,14 @@ print_int:
 ; rdi - на 1ую, rsi на 2ую
 string_equals:
     .equal_loop:
-        mov r11b, byte [rdi]      ; Загружаем байт из первой строки     
-        cmp r11b, byte [rsi] 
+        mov r11b, byte [rdi] ; Загружаем байт из первой строки     
+        cmp r11b, byte [rsi] ; сравниваем байт из 1ой строки и байт из 2ой     
         jne .not_equal 
-        test r11b, r11b    
-        jz .equal            
+        cmp r11b, 0 ; проверяем на нуль-терминант
+        je .equal            
         inc rdi                 
         inc rsi                 
         jmp .equal_loop
-
     .equal:            
         mov rax, 1
     .not_equal:
