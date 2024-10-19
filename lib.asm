@@ -202,25 +202,24 @@ read_word:
 ; Возвращает в rax: число, rdx : его длину в символах
 ; rdx = 0 если число прочитать не удалось
 parse_uint:
-	push rbx
+    push rbx
     xor rax, rax
     xor rdx, rdx ; счётчик
     .loop_digit:
         mov al, [rdi] ; байт из строки
-        test al, al          ; конца строки
+        test al, al ; конца строки
         jz .end               
-        sub al, '0'           ; преобразование ASCII в число
-        mov  rdx, 1       
-        ; Проверяем на переполнение 
-        shl  rax, rdx           ; Умножаем на 2 
-        add  rax, rax         ; rax *= 10
-        add  rax, rbx         ; rax += новое число
-        mov  rdx, rax         
+        sub al, '0' ; преобразование ASCII в число
+        cmp al, 9  
+        ja .end ; если больше '9', выходим    
+        shl rax, 1 ; Умножаем на 2
+        add rax, rax ; Умножаем на 10
+        add rax, rbx ; добовляем новое число             
         inc  rdx             
         inc  rdi             
         jmp .loop_digit    
     .end:
-	    pop rbx
+        pop rbx
         ret 
 
 
