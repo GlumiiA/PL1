@@ -225,39 +225,25 @@ parse_uint:
 ; Возвращает в rax: число, rdx : его длину в символах (включая знак, если он был) 
 ; rdx = 0 если число прочитать не удалось
 parse_int:         
-    xor rdx, rdx  
-    xor r8, r8     
+    xor rdx, rdx ; 16     
     .skip_spaces:
-        cmp byte [rdx + rdi], ' '  ; символ пробел
+        cmp byte [rdi], ' '  ; символ пробел
         je .skip_spaces       ; 
-        cmp byte [rdx + rdi], 0     ;  конец строки
+        cmp byte [rdi], 0     ;  конец строки
         je .end  
-        cmp byte [rdx + rdi], ''  
+        cmp byte [rdi], ''  
         je .end       
-        cmp byte [rdx + rdi], '-'   
-        jne .positive                   
-    .do_negative:
-        inc rdx
-	    push rdi
-        push rdx
-        call print_char
-        mov r8, rdx
-        pop rdx
-        pop rdi
-        neg rax
-        inc r8
-        jmp .end
+        cmp byte [rdi], '-'   
+        je .negative     
     .positive:
-        inc rdx
-        push rdi
-        push rdx
+        call parse_uint
+        jmp .end             
+    .negative:
+        inc rdi
         call print_char
-        mov r8, rdx
-        pop rdx
-        pop rdi
-        jmp .end
+        neg rax
+        inc rdx ; увеличиваем длину на 1
     .end 
-        mov rdx, r8
         ret
 
 ; Принимает указатель на строку, указатель на буфер и длину буфера
