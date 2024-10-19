@@ -85,8 +85,6 @@ print_uint:
 ; Выводит знаковое 8-байтовое число в десятичном формате 
 print_int:
     sub rsp, 8 ; выравниваем стек
-    test rdi, rdi ; проверяем на ноль
-    jz .printZero 
     mov rax, rdi
     test rax, rax ; проверяем на знак
     jge .positive 
@@ -101,13 +99,6 @@ print_int:
         mov rdi, rax
         call print_uint
         add rsp, 8 
-
-        ret
-        
-    .printZero:
-        call print_char
-        add rsp, 8 
-
         ret
 
 
