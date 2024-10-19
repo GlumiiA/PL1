@@ -197,9 +197,11 @@ parse_uint:
    mov r9, 10    
    .loop:
    mov r10b, byte [rdi]
-   sub r10b, '0'  
+   sub r10b, '0'   
    cmp r10b, 0
    jl .end 
+   cmp r10b, 9
+   jg .end
    mul r9
    add rax, r10
    inc rdx
@@ -207,7 +209,6 @@ parse_uint:
    jmp .loop
  .end:
   ret
-
 ; Принимает указатель на строку, пытается
 ; прочитать из её начала знаковое число.
 ; Если есть знак, пробелы между ним и числом не разрешены.
