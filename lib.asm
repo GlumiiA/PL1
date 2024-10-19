@@ -192,26 +192,29 @@ read_word:
 ; rdx = 0 если число прочитать не удалось
 parse_uint:
    xor rax, rax    
-   xor r8, r8      ; счётчик
+   xor r9, r9      ; счётчик
    xor r10, r10    ; для хранения числа
-   mov r9, 10      ; множитель для сдига
    .loop_digit:
-        mov r10b, byte [rdi + r8] ; байт из строки   
+        mov r10b, byte [rdi + r9] ; байт из строки   
         sub r10b, '0' 
         cmp r10b, 0 
         jl .end    
         cmp r10b, 9
         jg .end
-        push rdx
-        mov rdx, 10
-        mul rdx
-        pop rdx
+        mov r8, rax
+        ; Умножим текущее значение на 10
+        ; rax * 10 = (rax << 1) + (rax << 3)
+        push rbx
+        shl rax, 3 ; Умножаем  на 8
+        mov rbx, r8 ; Загружаем rax(до *) в rbx
+        shl rbx, 1 ; Умножаем на 2
         add rax, r10
-        inc r8
+        inc r9
         jmp .loop_digit
     .end:
-        mov rdx, r8
+        mov rdx, r9
         ret
+
 
 
 ; Принимает указатель на строку, пытается
