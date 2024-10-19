@@ -57,35 +57,30 @@ print_newline:
 ; Выводит беззнаковое 8-байтовое число в десятичном формате 
 ; Совет: выделите место в стеке и храните там результаты деления
 ; Не забудьте перевести цифры в их ASCII коды.
-parse_uint:
-    xor rax, rax
-    xor rdx, rdx ; счётчик
-    xor r10, r10 ; для хранения rax
-    .loop_digit:
-        mov bl, byte[rdi] ; байт из строки              
-        cmp bl, '0' 
-        jb .end 
-        cmp bl, '9' ; конца строки
-        ja .end ; если больше '9', выходим 
-        push rdx
-        mov rdx, 10
-        mul rdx
-        pop rdx
-        ; mov r10, rax
-        ; Умножим текущее значение на 10
-        ; rax * 10 = (rax << 1) + (rax << 3)
-        ; push rbx
-        ; shl rax, 3 ; Умножаем  на 8
-        ; mov rbx, r10 ; Загружаем rax(до *) в rbx
-        ; shl rbx, 1 ; Умножаем на 2
-        ; add rax, rbx 
-        add al, bl        ; Теперь добавляем текущую цифру 
-        cmp al, '9'       
-        inc  rdx             
-        inc  rdi             
-        jmp .loop_digit    
-    .end:
-        ret 
+print_uint: 
+    push rbx  ; 16      
+    mov rax, rdi 
+    mov rbx, 10 ; делитель
+    mov rsi, rsp ; сохраняем указатель на строку
+    sub rsp, 40   ; выделим место в стеке
+    dec rsi
+    mov byte [rsi], 0 ; указатель на нуль-терминированную строку
+    .loopDiv:
+        xor rdx, rdx
+        div rbx ; делим на rbx
+        add dl, '0' ; Переводим остаток в ASCII
+        dec rsi
+        mov byte [rsi], dl ; сохраняем остаток о деления
+        test rax, rax
+        jnz .loopDiv
+    .outRes:
+        mov rdi, rsi   ; передает указатель на строку
+        push rdi 
+        call print_string
+        pop rdi
+        add rsp, 40
+        pop rbx
+        ret
 
 
 ; Выводит знаковое 8-байтовое число в десятичном формате 
@@ -210,27 +205,34 @@ read_word:
 ; rdx = 0 если число прочитать не удалось
 parse_uint:
     xor rax, rax
-    xor rdx, rdx
-    .A:
-        ; Если сивол не число переходи в состояние B (выход)
-        cmp byte[rdi], '0'
-        jb .B
-        cmp byte[rdi], '9'
-        ja .B
-        ; Умножили текущее значение на 10
+    xor rdx, rdx ; счётчик
+    xor r10, r10 ; для хранения rax
+    .loop_digit:
+        mov bl, byte[rdi] ; байт из строки              
+        cmp bl, '0' 
+        jb .end 
+        cmp bl, '9' ; конца строки
+        ja .end ; если больше '9', выходим 
         push rdx
         mov rdx, 10
         mul rdx
         pop rdx
-        ; Добавили новый разряд
-        add al, byte[rdi]
-        sub al, '0'
-        ; Увеличили счётчик разрядов и указатель на строку
-        inc rdx
-        inc rdi
-        jmp .A
-    .B:
-        ret
+        ; mov r10, rax
+        ; Умножим текущее значение на 10
+        ; rax * 10 = (rax << 1) + (rax << 3)
+        ; push rbx
+        ; shl rax, 3 ; Умножаем  на 8
+        ; mov rbx, r10 ; Загружаем rax(до *) в rbx
+        ; shl rbx, 1 ; Умножаем на 2
+        ; add rax, rbx 
+        add al, bl        ; Теперь добавляем текущую цифру 
+        cmp al, '9'       
+        inc  rdx             
+        inc  rdi             
+        jmp .loop_digit    
+    .end:
+        ret 
+
 
 
 ; Принимает указатель на строку, пытается
