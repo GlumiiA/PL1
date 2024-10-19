@@ -203,9 +203,10 @@ read_word:
 ; Возвращает в rax: число, rdx : его длину в символах
 ; rdx = 0 если число прочитать не удалось
 parse_uint:
-    push rbx
+	push rbx
     xor rax, rax
     xor rdx, rdx ; счётчик
+    xor r10, r10
     .loop_digit:
         mov al, [rdi] ; байт из строки
         test al, al ; конца строки
@@ -213,18 +214,23 @@ parse_uint:
         sub al, '0' ; преобразование ASCII в число
         cmp al, 9  
         ja .end ; если больше '9', выходим 
+        mov r10, rax
         ; Умножим текущее значение на 10
         ; rax * 10 = (rax << 1) + (rax << 3)
-        shl rax, 1 ; Умножаем на 2
-        add rax, rax ; Умножаем на 4
-        add rax, rax ; Умножаем на 8
-        add rax, rbx       
+        push rbx
+        shl rax, 3 ; Умножаем  на 8
+        mov rbx, r10 ; Загружаем rax(до *) в rbx
+        shl rbx, 1 ; Умножаем на 2
+        add rax, rbx 
+        pop rbx 
+        add rax, rbx        ; Теперь добавляем текущую цифру       
         inc  rdx             
         inc  rdi             
         jmp .loop_digit    
     .end:
-        pop rbx
+	    pop rbx
         ret 
+
 
 
 ; Принимает указатель на строку, пытается
