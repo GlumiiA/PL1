@@ -204,7 +204,6 @@ read_word:
 ; Возвращает в rax: число, rdx : его длину в символах
 ; rdx = 0 если число прочитать не удалось
 parse_uint:
-    xor rax, rax
     xor rdx, rdx ; счётчик
     xor r10, r10 ; для хранения rax
     .loop_digit:
@@ -217,14 +216,6 @@ parse_uint:
         mov rdx, 10
         mul rdx
         pop rdx
-        ; mov r10, rax
-        ; Умножим текущее значение на 10
-        ; rax * 10 = (rax << 1) + (rax << 3)
-        ; push rbx
-        ; shl rax, 3 ; Умножаем  на 8
-        ; mov rbx, r10 ; Загружаем rax(до *) в rbx
-        ; shl rbx, 1 ; Умножаем на 2
-        ; add rax, rbx 
         add al, bl        ; Теперь добавляем текущую цифру 
         sub al, '0'    
         inc  rdx             
