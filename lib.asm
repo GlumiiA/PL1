@@ -206,38 +206,22 @@ parse_uint:
     push rbx
     xor rax, rax
     xor rdx, rdx ; счётчик
-    xor rbx, rbx ; для хранения тек символа
     xor r10, r10 ; для хранения rax
     .loop_digit:
-        mov al, byte [rdi] ; байт из строки
-        test al, al ; конца строки
-        jz .end     
-        cmp al, '0' ; конца строки
-        jl .end 
-        cmp al, '9' 
-        jg .end ; если больше '9', выходим 
+        mov bl, byte[rdi] ; байт из строки              
+        cmp bl, '0' ; конца строки
+        jb .end 
+        cmp bl, '9' 
+        ja .end ; если больше '9', выходим 
         push rdx
         mov rdx, 10
         mul rdx
         pop rdx
-        ; mov r10, rax
-        ; Умножим текущее значение на 10
-        ; rax * 10 = (rax << 1) + (rax << 3)
-        ; push rbx
-        ; shl rax, 3 ; Умножаем  на 8
-        ; mov rbx, r10 ; Загружаем rax(до *) в rbx
-        ; shl rbx, 1 ; Умножаем на 2
-        ; add rax, rbx 
-        sub al, '0' ; преобразование ASCII в число
-        add rax, rbx        ; Теперь добавляем текущую цифру       
+        add al, bl        ; Теперь добавляем текущую цифру       
         inc  rdx             
         inc  rdi             
         jmp .loop_digit    
-    .endloop:
-        test rdx, rdx
-        jne .end
-        mov rdx, 0
-    .end
+    .end:
 	pop rbx
         ret 
 
