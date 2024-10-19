@@ -194,9 +194,10 @@ parse_uint:
    xor rax, rax    ; для накопления результата
    xor rdx, rdx ; счётчик
    xor r10, r10
-   mov r9, 10    
+   mov r9, 10   
+   xor r8, r8
    .loop:
-   mov r10b, byte [rdi]
+   mov r10b, byte [rdi + r8]
    sub r10b, '0'   
    cmp r10b, 0
    jl .end 
@@ -205,7 +206,7 @@ parse_uint:
    mul r9
    add rax, r10
    inc rdx
-   inc rdi
+   inc r8
    jmp .loop
  .end:
   ret
