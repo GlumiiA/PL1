@@ -205,18 +205,16 @@ read_word:
 ; rdx = 0 если число прочитать не удалось
 parse_uint:
     xor rdx, rdx ; счётчик
-    xor r10, r10 ; для хранения rax
-    .loop_digit:
-        mov bl, byte[rdi] ; байт из строки              
-        cmp bl, '0' 
+    .loop_digit:             
+        cmp byte[rdi], '0' 
         jb .end 
-        cmp bl, '9' ; конца строки
+        cmp byte[rdi], '9' ; конца строки
         ja .end ; если больше '9', выходим 
         push rdx
         mov rdx, 10
         mul rdx
         pop rdx
-        add al, bl        ; Теперь добавляем текущую цифру 
+        add al, byte[rdi]       ; Теперь добавляем текущую цифру 
         sub al, '0'    
         inc  rdx             
         inc  rdi             
