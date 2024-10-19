@@ -106,18 +106,6 @@ print_int:
 ; Принимает два указателя на нуль-терминированные строки, возвращает 1 если они равны, 0 иначе
 ; rdi - на 1ую, rsi на 2ую
 string_equals:
-;    push rsi
-;    push rdi
-;    call string_length 
-;   mov rdx, rax ; длина первой строки
-;    mov rdi, rsi ; 
-;    call string_length 
-;    mov rcx, rax ; длина 2ой строки
-;    pop rdi
-;    pop rsi
-;    xor rax, rax 
-;    cmp rdx, rcx
-;    jne .not_equal 
     .equal_loop:
         mov r11b, byte [rdi]      ; Загружаем байт из первой строки     
         cmp r11b, byte [rsi] 
@@ -226,48 +214,14 @@ parse_uint:
     .B:
         ret
 
-
 ; Принимает указатель на строку, пытается
 ; прочитать из её начала знаковое число.
 ; Если есть знак, пробелы между ним и числом не разрешены.
 ; Возвращает в rax: число, rdx : его длину в символах (включая знак, если он был) 
 ; rdx = 0 если число прочитать не удалось
 parse_int:
-    xor rax, rax         
-    xor rdx, rdx
-    xor r8, r8         
-    mov rcx, rdi
-    .skip_spaces:
-        cmp byte [rcx], ' '  ; символ пробел
-        je .skip_spaces       ; 
-        cmp byte [rcx], 0     ;  конец строки
-        je .end          
-        cmp byte [rcx], '-'   
-        je .negative           
-        cmp byte [rcx], '+'   
-        je .positive        
-    .do_positiv:
-	sub rsp, 8
-        call parse_uint
-	add rsp, 8
-        test rdx, rdx          ; Проверяем, было ли прочитано число
-        jz .end              
-        cmp r8, 1    ; Проверяем, есть ли знак
-        jnz .sign_add    
-        jmp .end       
-    .negative:
-        mov dword r8d, 1  
-        inc rcx                
-        jmp .do_positiv
-    .positive:
-        inc rcx               
-        jmp .do_positiv
-    .sign_add:
-        neg rax       
-        jmp .end
-    .end:
-        xor rax, rax 
-        ret
+    xor rax, rax 
+    ret
 
 ; Принимает указатель на строку, указатель на буфер и длину буфера
 ; Копирует строку в буфер
