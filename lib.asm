@@ -244,9 +244,9 @@ parse_int:
         add rsp, 8
         neg rax
         inc rdx ; увеличиваем длину на 1
-    .end 
+    .end: 
         ret
-    .endnull
+    .endnull:
         xor rax, rax
         mov rdx, 1
         ret  
