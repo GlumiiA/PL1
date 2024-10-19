@@ -135,6 +135,7 @@ string_equals:
 ; Читает один символ из stdin и возвращает его. Возвращает 0 если достигнут конец потока
 read_char:
     push rdi   
+    xor rax, rax
     mov rdi, 0 ; stdin (0)  
     sub rsp, 1
     lea rsi, [rsp]    
