@@ -58,33 +58,29 @@ print_newline:
 ; Совет: выделите место в стеке и храните там результаты деления
 ; Не забудьте перевести цифры в их ASCII коды.
 print_uint: 
-    enter 0, 0 
     push rbx  ; 16      
     mov rax, rdi 
     mov rbx, 10 ; делитель
-    sub rsp, 32   ; выделим место в стеке
     mov rsi, rsp ; сохраняем указатель на строку
+    sub rsp, 32   ; выделим место в стеке
     xor rcx, rcx   ; счётчик символов
+    dec rsi
+    mov byte [rsi], 0 ; указатель на нуль-терминированную строку
     .loopDiv:
         xor rdx, rdx
         div rbx ; делим на rbx
         add dl, '0' ; Переводим остаток в ASCII
-        lea rdi, [rsi + 31 - rcx] ; Вычисляем адрес для записи 
-        mov byte [rdi], dl ; сохраняем остаток о деления
+        dec rsi
+        mov byte [rsi], dl ; сохраняем остаток о деления
         inc rcx ; увеличиваем   счётчик
         test rax, rax
         jnz .loopDiv
     .outRes:
-        mov byte [rsi + 31 - rcx], 0 ; указатель на нуль-терминированную строку
-        lea rdi, [rsi + 31 - rcx] ; Вычисляем адрес для записи 
-        add rsp, rcx   ; Добавляем значения rcx к rsp
         mov rdi, rsi   ; передает указатель на строку
         call print_string
         add rsp, 32
         pop rbx
-        leave
         ret
-
  
 ; Выводит знаковое 8-байтовое число в десятичном формате 
 print_int: 
