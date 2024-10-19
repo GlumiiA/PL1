@@ -218,7 +218,7 @@ parse_uint:
         shl rax, 1 ; Умножаем на 2
         add rax, rax ; Умножаем на 4
         add rax, rax ; Умножаем на 8
-        add rax, rax       
+        add rax, rbx       
         inc  rdx             
         inc  rdi             
         jmp .loop_digit    
