@@ -226,10 +226,8 @@ parse_uint:
 ; rdx = 0 если число прочитать не удалось
 parse_int:         
     xor rdx, rdx ;   
-    cmp byte [rdi], '0'     ;  конец строки
-    je .endnull  
-    cmp byte [rdi], ''  
-    je .end       
+    cmp byte [rdi], 0     ;  конец строки
+    je .endnull     
     cmp byte [rdi], '-'   
     je .negative     
     .positive:
@@ -240,13 +238,13 @@ parse_int:
     .negative:
         inc rdi
         sub rsp, 8 ; 16
-        call print_char
+        call print_uint
         add rsp, 8
         neg rax
         inc rdx ; увеличиваем длину на 1
-    .end: 
+    .end 
         ret
-    .endnull:
+    .endnull
         xor rax, rax
         mov rdx, 1
         ret  
