@@ -231,7 +231,9 @@ parse_int:
         cmp byte [rdx + rdi], ' '  ; символ пробел
         je .skip_spaces       ; 
         cmp byte [rdx + rdi], 0     ;  конец строки
-        je .end          
+        je .end  
+        cmp byte [rdx + rdi], ''  
+        je .end       
         cmp byte [rdx + rdi], '-'   
         jne .positive                   
     .do_negative:
@@ -256,7 +258,6 @@ parse_int:
         jmp .end
     .end 
         mov rdx, r8
-        
         ret
 
 ; Принимает указатель на строку, указатель на буфер и длину буфера
