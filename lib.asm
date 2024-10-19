@@ -242,9 +242,9 @@ parse_int:
         add rsp, 8
         neg rax
         inc rdx ; увеличиваем длину на 1
-    .end 
+    .end: 
         ret
-    .endnull
+    .endnull:
         xor rax, rax
         mov rdx, 1
         ret  
@@ -253,10 +253,6 @@ parse_int:
 ; Копирует строку в буфер
 ; Возвращает длину строки если она умещается в буфер, иначе 0
 string_copy:
-    ;rdi - link to string
-    ;rsi - link to bufer
-    ;rdx - bufer length
-
     ; Если буфер сразу нулевой то просто идём в состояние overflow 
     test rdx, rdx
     jz .overflow
