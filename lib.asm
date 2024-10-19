@@ -225,7 +225,8 @@ parse_uint:
 ; Возвращает в rax: число, rdx : его длину в символах (включая знак, если он был) 
 ; rdx = 0 если число прочитать не удалось
 parse_int:         
-    xor rdx, rdx ; 16     
+    xor rdx, rdx ; 16 
+    mov rax, 0   
     cmp byte [rdi], 0     ;  конец строки
     je .end  
     cmp byte [rdi], ''  
