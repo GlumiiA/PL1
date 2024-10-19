@@ -236,12 +236,10 @@ parse_int:
         add rsp, 8
         jmp .end             
     .negative:
-        inc rdi
+        inc rdi ; переходим на следующий символ
         sub rsp, 8 ; 16
         call parse_uint
         add rsp, 8
-        test rdx, rdx
-        jz .err
         neg rax
         inc rdx ; увеличиваем длину на 1
     .end 
@@ -250,9 +248,6 @@ parse_int:
         xor rax, rax
         mov rdx, 1
         ret  
-    .err
-        xor rdx, rdx
-        ret
 
 ; Принимает указатель на строку, указатель на буфер и длину буфера
 ; Копирует строку в буфер
