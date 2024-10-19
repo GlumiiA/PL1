@@ -206,19 +206,19 @@ read_word:
 parse_uint:
     xor rdx, rdx ; счётчик
     .loop_digit:             
-        cmp byte[rdi], '0' 
-        jb .end 
-        cmp byte[rdi], '9' ; конца строки
-        ja .end ; если больше '9', выходим 
+        cmp byte[rdi], '0'
+        jb .end
+        cmp byte[rdi], '9'
+        ja .end
         push rdx
         mov rdx, 10
         mul rdx
         pop rdx
-        add al, byte[rdi]       ; Теперь добавляем текущую цифру 
-        sub al, '0'    
-        inc  rdx             
-        inc  rdi             
-        jmp .loop_digit    
+        add al, byte[rdi]
+        sub al, '0'
+        inc rdx
+        inc rdi
+        jmp .loop_digit
     .end:
         ret 
 
