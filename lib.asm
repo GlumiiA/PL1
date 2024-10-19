@@ -253,21 +253,34 @@ parse_int:
 ; Копирует строку в буфер
 ; Возвращает длину строки если она умещается в буфер, иначе 0
 string_copy:
-    ; rdi rsi rdx указатели на строку, буфер, длину буфера
-    xor rax, rax ; счётчик 
-    .loop_string:
-        mov bl, byte [rdi + rax]
-        mov byte [rsi], bl ; записываем в буфер
-        inc rax 
-        inc rsi
-        inc rdx
-        cmp bl, 0 ; проверяем на нуль-термининант
-        je .end
-        cmp rax, rdx
-        je .end_null ; если количество символов больше, чем длина буфера
-        jmp .loop_string
-    .end_null:
-        mov rax, rax
-        ret
-    .end:
-        ret
+    ;rdi - link to string
+    ;rsi - link to bufer
+    ;rdx - bufer length
+
+    ; Если буфер сразу нулевой то просто идём в состояние overflow 
+    test rdx, rdx
+    jz .overflow
+    ; инициализировали длинну
+    xor rax, rax
+ .cycle:
+    ; скопировали очередной символ
+    mov r10b, byte [rdi]
+    mov byte [rsi], r10b
+    inc rax
+    inc rdi
+    inc rsi
+    ; Если пришли в нуль-терминатор переходи в состояние completed
+    cmp r10b, NULL_TERMINATOR
+    je .completed
+    ; Если места в буфере больше нет то в состояние overflow
+    cmp rdx, rax
+    je .overflow
+
+    jmp .cycle
+
+ .overflow:
+    xor rax, rax
+    ret
+
+ .completed:
+    ret
