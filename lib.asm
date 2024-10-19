@@ -62,8 +62,7 @@ print_uint:
     mov rax, rdi 
     mov rbx, 10 ; делитель
     mov rsi, rsp ; сохраняем указатель на строку
-    sub rsp, 32   ; выделим место в стеке
-    xor rcx, rcx   ; счётчик символов
+    sub rsp, 40   ; выделим место в стеке
     dec rsi
     mov byte [rsi], 0 ; указатель на нуль-терминированную строку
     .loopDiv:
@@ -72,16 +71,17 @@ print_uint:
         add dl, '0' ; Переводим остаток в ASCII
         dec rsi
         mov byte [rsi], dl ; сохраняем остаток о деления
-        inc rcx ; увеличиваем   счётчик
         test rax, rax
         jnz .loopDiv
     .outRes:
         mov rdi, rsi   ; передает указатель на строку
+        push rdi
         call print_string
-        add rsp, 32
+        pop rdi
+        add rsp, 40
         pop rbx
         ret
- 
+
 ; Выводит знаковое 8-байтовое число в десятичном формате 
 print_int: 
 	sub rsp, 8
