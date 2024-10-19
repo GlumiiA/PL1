@@ -233,7 +233,11 @@ parse_uint:
         inc  rdx             
         inc  rdi             
         jmp .loop_digit    
-    .end:
+    .endloop:
+        test rdx, rdx
+        jne .end
+        mov rdx, 0
+    .end
 	pop rbx
         ret 
 
