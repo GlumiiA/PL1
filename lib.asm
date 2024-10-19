@@ -210,9 +210,11 @@ parse_uint:
     .loop_digit:
         mov al, byte [rdi] ; байт из строки
         test al, al ; конца строки
-        jz .end               
+        jz .end     
+        cmp al, '0' ; конца строки
+        jl .end 
         cmp al, '9' 
-        ja .end ; если больше '9', выходим 
+        jg .end ; если больше '9', выходим 
         sub al, '0' ; преобразование ASCII в число
         push rdx
         mov rdx, 10
