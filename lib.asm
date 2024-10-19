@@ -204,28 +204,26 @@ read_word:
 ; Возвращает в rax: число, rdx : его длину в символах
 ; rdx = 0 если число прочитать не удалось
 parse_uint:
-    xor rdx, rdx ; счётчик
-    .loop_digit:             
+    xor rdx, rdx
+    .A:
+        ; Если сивол не число переходи в состояние B (выход)
         cmp byte[rdi], '0'
-        jb .end
+        jb .B
         cmp byte[rdi], '9'
-        ja .end
+        ja .B
+        ; Умножили текущее значение на 10
         push rdx
         mov rdx, 10
         mul rdx
         pop rdx
+        ; Добавили новый разряд
         add al, byte[rdi]
         sub al, '0'
+        ; Увеличили счётчик разрядов и указатель на строку
         inc rdx
         inc rdi
-        jmp .loop_digit
-    .end:
-        test rdx, rdx
-        jne .end2
-        ret
-    .end2
-        mov rax, o
-        mov rdx, 0
+        jmp .A
+    .B:
         ret
 
 
