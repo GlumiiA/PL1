@@ -119,6 +119,7 @@ string_equals:
     .equal:            
         mov rax, 1
     .not_equal:
+        xor rax, rax
         ret
 
 ; Читает один символ из stdin и возвращает его. Возвращает 0 если достигнут конец потока
