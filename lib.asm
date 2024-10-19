@@ -117,6 +117,7 @@ string_equals:
         jmp .equal_loop
     .equal:            
         mov rax, 1
+        ret
     .not_equal:
         xor rax, rax
         ret
