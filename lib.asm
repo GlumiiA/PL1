@@ -192,24 +192,23 @@ read_word:
 ; rdx = 0 если число прочитать не удалось
 parse_uint:
    xor rax, rax    ; для накопления результата
-   xor rdx, rdx ; счётчик
-   xor r10, r10
-   mov r9, 10   
-   xor r8, r8
+   xor r8, r8      ; длина числа
+   xor r10, r10    ; буффер для работы с числом
+   mov r9, 10      ; константа для умножения
    .loop:
    mov r10b, byte [rdi + r8]
-   sub r10b, '0'   
-   cmp r10b, 0
-   jl .end 
+   sub r10b, '0'  
+   jl .end    
    cmp r10b, 9
    jg .end
    mul r9
    add rax, r10
-   inc rdx
    inc r8
    jmp .loop
- .end:
+  .end:
+  mov rdx, r8
   ret
+
 ; Принимает указатель на строку, пытается
 ; прочитать из её начала знаковое число.
 ; Если есть знак, пробелы между ним и числом не разрешены.
