@@ -224,9 +224,40 @@ parse_uint:
 ; Если есть знак, пробелы между ним и числом не разрешены.
 ; Возвращает в rax: число, rdx : его длину в символах (включая знак, если он был) 
 ; rdx = 0 если число прочитать не удалось
-parse_int:
-    xor rax, rax 
-    ret
+parse_int:         
+    xor rdx, rdx  
+    xor r8, r8     
+    .skip_spaces:
+        cmp byte [rdx + rdi], ' '  ; символ пробел
+        je .skip_spaces       ; 
+        cmp byte [rdx + rdi], 0     ;  конец строки
+        je .end          
+        cmp byte [rdx + rdi], '-'   
+        jne .positive                   
+    .do_negative:
+        inc rdx
+	    push rdi
+        push rdx
+        call print_char
+        mov r8, rdx
+        pop rdx
+        pop rdi
+        neg rax
+        inc r8
+        jmp .end
+    .positive:
+        inc rdx
+        push rdi
+        push rdx
+        call print_char
+        mov r8, rdx
+        pop rdx
+        pop rdi
+        jmp .end
+    .end 
+        mov rdx, r8
+        
+        ret
 
 ; Принимает указатель на строку, указатель на буфер и длину буфера
 ; Копирует строку в буфер
