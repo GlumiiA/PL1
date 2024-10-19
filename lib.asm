@@ -134,14 +134,13 @@ string_equals:
 
 ; Читает один символ из stdin и возвращает его. Возвращает 0 если достигнут конец потока
 read_char:
-    push rdi 
-    xor rax, rax   
-    mov rdi, 0               ; stdin (0)  
+    push rdi   
+    mov rdi, 0 ; stdin (0)  
     sub rsp, 1
     lea rsi, [rsp]    
     mov rdx, 1
     syscall
-    mov al, [rsp]                    
+    mov al, [rsp] ; прочитанный символ в al                    
     pop rdi
     add rsp, 1               
     ret
@@ -205,15 +204,15 @@ read_word:
 parse_uint:
 	push rbx
     xor rax, rax
-    xor rdx, rdx
+    xor rdx, rdx ; счётчик
     .loop_digit:
-        mov al, [rdi + rdx] ; байт из строки
+        mov al, [rdi] ; байт из строки
         test al, al          ; конца строки
         jz .end               
         sub al, '0'           ; преобразование ASCII в число
-        mov  rbx, rax        
+        mov  rdx, 1       
         ; Проверяем на переполнение 
-        shl  rax, 1           ; Умножаем на 2 
+        shl  rax, rdx           ; Умножаем на 2 
         add  rax, rax         ; rax *= 10
         add  rax, rbx         ; rax += новое число
         mov  rdx, rax         
@@ -221,10 +220,8 @@ parse_uint:
         inc  rdi             
         jmp .loop_digit    
     .end:
-        xor rax, rdx
-	pop rbx
+	    pop rbx
         ret 
-
 
 
 ; Принимает указатель на строку, пытается
