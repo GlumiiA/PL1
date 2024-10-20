@@ -160,7 +160,7 @@ read_word:
         je .loop_spaces    
     .read:
         cmp r14, r13   ; проверка, что не overflow
-        jge .fail
+        jge .buffer_overflow
         mov byte [r12 + r14], al; перемещаем символ в буффер
         inc r14
         call read_char
@@ -178,9 +178,11 @@ read_word:
         mov rdx, r14
         mov rax, r12
         jmp .end
+  
     .buffer_overflow:
         xor rdx, rdx
         xor rax, rax            
+  
     .end:
         pop r14
         pop r13
