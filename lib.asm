@@ -258,9 +258,9 @@ string_copy:
     .loop_string: 
         cmp rcx, rdx 
         je .end_null ; если количество символов больше, чем длина буфера
-        mov al, [rdi]   ; считанный символ временно в rax 
-        mov [rsi], al   ; из rax - в буффер 
-        test al, al    ; проверка на 0-терминатор 
+        mov al, [rdi]   ;
+        mov [rsi], al   ; записываем в буфер 
+        test al, al    ; проверяем на нуль-термининант
         jz .end 
         inc rdi 
         inc rsi 
