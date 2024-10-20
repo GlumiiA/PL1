@@ -254,20 +254,20 @@ parse_int:
 string_copy:
     ; rdi rsi rdx указатели на строку, буфер, длину буфера
     xor rax, rax
-    xor rcx, rcx ; счётчик 
-    .loop_string:
-        cmp rcx, rdx
+    xor rcx, rcx    ; счётчик  
+    .loop_string: 
+        cmp rcx, rdx 
         je .end_null ; если количество символов больше, чем длина буфера
-        mov al, byte [rdi]
-        mov byte [rsi], al ; записываем в буфер
+        mov al, [rdi]   ; считанный символ временно в rax 
+        mov [rsi], al   ; из rax - в буффер 
+        test al, al    ; проверка на 0-терминатор 
+        jz .end 
+        inc rdi 
+        inc rsi 
         inc rcx 
-        inc rsi
-        inc rdi
-        test al, al ; проверяем на нуль-термининант
-        jz .end
-        jmp .loop_string
-    .end_null:
-        mov rax, rax
-    .end:
+        jmp .loop_string 
+    .end_null: 
+        xor rax, rax 
+    .end: 
         ret
 
