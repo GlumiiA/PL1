@@ -141,38 +141,45 @@ read_char:
 ; При неудаче возвращает 0 в rax
 ; Эта функция должна дописывать к слову нуль-терминатор
 read_word:
+    push r12 ; 16
+    push r13 ; 8
     mov r12, rdi ; адрес начала буфера
     mov r13, rsi ; размер буфера
     xor r10, r10
     xor rcx, rcx ; длина слова
     test r13, r13            ; Проверяем, пустой ли буфер
     jz .buffer_overflow
-    sub rsp, 8 ; 16
+    sub rsp, 8 ; 16 выравниваем стек
     .loop_spaces:
         call read_char ; читаем символ     
-        cmp rax, 0x0      
+        cmp rax, 0x20 ; пропускаем пробел
+        je .loop_spaces
+        cmp rax, 0x9  ; пропускаем табуляцию
+        je .loop_spaces
+        cmp rax, 0xA  ; пропускаем перевод строки
+        je .loop_spaces
+    .read:
+        cmp rax, 0 ; проверяем на нуль-терминант
         je .end
-        cmp rax, 0x20
-        je .loop_spaces
-        cmp rax, 0x9   
-        je .loop_spaces
-        cmp rax, 0xA
-        je .loop_spaces
         inc rcx ; увеличиваем длину на 1
         cmp r13, rcx ; проверяем, не превышен ли размер буфера
         jb .buffer_overflow
-        mov [rdi + rcx], r10b
+        mov byte [r12], r10b ; символ в буфер
+        inc r12
+        call read_char
         jmp .loop_spaces
     .end:
-        inc rcx
-        cmp r13, rcx ; проверяем, не превышен ли размер буфера
-        jbe .buffer_overflow
-        mov byte [rdi + rcx], 0x0   ; Добавляем нуль-терминатор
+        mov byte [r12], 0x0   ; Добавляем нуль-терминатор
         mov rdx, rcx        ; rdx = длина слова
         mov rax, rdi  
+        pop r12
+        pop r13
         add rsp, 8     
         ret
     .buffer_overflow:
+        pop r12
+        pop r13
+        add rsp, 8
         xor rax, rax          ; Ошибка: установка rax в 0
         ret
 
