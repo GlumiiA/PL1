@@ -255,11 +255,11 @@ string_copy:
         inc rdx
         cmp bl, 0 ; проверяем на нуль-термининант
         je .end
-        cmp rax, rdx
-        je .end_null ; если количество символов больше, чем длина буфера
+        cmp rdx, rax
+        jae .end_null ; если количество символов больше, чем длина буфера
         jmp .loop_string
     .end_null:
-        mov rax, rax
+        xor rax, rax
         ret
     .end:
         ret
