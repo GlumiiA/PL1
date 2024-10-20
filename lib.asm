@@ -147,6 +147,7 @@ read_word:
     mov r12, rdi ; адрес начала буфера
     mov r13, rsi ; размер буфера
     xor r14, r14 ; Длина буфера
+    xor rdx, rdx
     test r13, r13            ; Проверяем, пустой ли буфер
     jz .buffer_overflow
     .loop_spaces:
