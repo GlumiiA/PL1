@@ -158,7 +158,7 @@ read_word:
         je .loop_spaces  
         cmp al, 0xA ; пропускаем перевод строки
         je .loop_spaces    
-    .loop_spaces:
+    .read:
         cmp r14, r13   ; проверка, что не overflow
         jge .fail
         mov byte [r12 + r14], al; перемещаем символ в буффер
@@ -172,7 +172,7 @@ read_word:
         je .end_of_word
         test al, al    ; проверка на конец стрима
         jz .end_of_word
-        jmp .loop_spaces
+        jmp .read
     .end_of_word:
         mov byte [r12 + r14], 0 ; добавляем 0-терминатор в конец слова
         mov rdx, r14
