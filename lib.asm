@@ -253,16 +253,17 @@ parse_int:
 ; Возвращает длину строки если она умещается в буфер, иначе 0
 string_copy:
     ; rdi rsi rdx указатели на строку, буфер, длину буфера
-    xor rax, rax ; счётчик 
+    xor rax, rax
+    xor rcx, rcx ; счётчик 
     .loop_string:
-        mov bl, byte [rdi + rax]
-        mov byte [rsi], bl ; записываем в буфер
-        inc rax 
+        cmp rcx, rdx
+        je .end_null ; если количество символов больше, чем длина буфера
+        mov al, byte [rdi + rcx]
+        mov byte [rsi], al ; записываем в буфер
+        inc rcx 
         inc rsi
-        cmp bl, 0 ; проверяем на нуль-термининант
+        cmp al, 0 ; проверяем на нуль-термининант
         je .end
-        cmp rax, rdx
-        jae .end_null ; если количество символов больше, чем длина буфера
         jmp .loop_string
     .end_null:
         mov rax, rax
