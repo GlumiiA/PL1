@@ -147,7 +147,6 @@ read_word:
     mov r12, rdi ; адрес начала буфера
     mov r13, rsi ; размер буфера
     xor r14, r14 ; Длина буфера
-    xor rdx, rdx
     test r13, r13            ; Проверяем, пустой ли буфер
     jz .buffer_overflow
     .loop_spaces:
@@ -180,14 +179,15 @@ read_word:
         mov byte [r12], 0x0 ; добавляем нуль-терминант
         mov rdx, r14 ; rdx = длина слова
         mov rax, r12
+        pop r14
         pop r13
         pop r12
-        pop r14
         ret                     
     .buffer_overflow:
+        pop r14
         pop r13
         pop r12
-        pop r14
+        xor rdx, rdx
         xor rax, rax            
         ret
 ; Принимает указатель на строку, пытается
