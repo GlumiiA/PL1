@@ -260,11 +260,11 @@ string_copy:
         je .end_null ; если количество символов больше, чем длина буфера
         mov al, byte [rdi]
         mov byte [rsi], al ; записываем в буфер
+        test al, al ; проверяем на нуль-термининант
+        je .end
         inc rcx 
         inc rsi
         inc rdi
-        tets al, al ; проверяем на нуль-термининант
-        je .end
         jmp .loop_string
     .end_null:
         mov rax, rax
