@@ -258,11 +258,12 @@ string_copy:
     .loop_string:
         cmp rcx, rdx
         je .end_null ; если количество символов больше, чем длина буфера
-        mov al, byte [rdi + rcx]
+        mov al, byte [rdi]
         mov byte [rsi], al ; записываем в буфер
         inc rcx 
         inc rsi
-        cmp al, 0 ; проверяем на нуль-термининант
+        inc rdi
+        tets al, al ; проверяем на нуль-термининант
         je .end
         jmp .loop_string
     .end_null:
@@ -270,3 +271,4 @@ string_copy:
         ret
     .end:
         ret
+
