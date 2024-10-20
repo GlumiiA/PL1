@@ -141,51 +141,52 @@ read_char:
 ; При неудаче возвращает 0 в rax
 ; Эта функция должна дописывать к слову нуль-терминатор
 read_word:
-    push r13 ; 16
-    push r12 ; 8
+    push r12 ; 16
+    push r13 ; 8
+    push r14 ; 16
     mov r12, rdi ; адрес начала буфера
-    mov r13, rsi             ; размер буфера
-    test r13, r13            ; Проверяем, пустой ли буфер
-    jz .buffer_overflow     ; Если да, буфер слишком мал
+    mov r13, rsi ; размер буфера
+    xor r14, r14 ; Длина буфера
 .loop_spaces:
-    call read_char ; читаем символ  
+    call read_char ; читаем символ 
+    test al, al            
+    jz .buffer_overflow
     cmp rax, 0x20 ; пропускаем, если пробел
     je .loop_spaces 
     cmp rax, 0x9  ; пропускаем табуляцию
     je .loop_spaces  
     cmp rax, 0xA ; пропускаем перевод строки
     je .loop_spaces      
-.read_word_loop:
+.read_loop:
     cmp rax, 0x0 ; проверяем на нуль-терминант
     je .end
-    cmp rax, 0x20            ; Пробел - конец чтения слова
+    cmp rax, 0x20         
     je .end
-    cmp rax, 0x9             ; Табуляция - конец чтения слова
+    cmp rax, 0x9             
     je .end
-    cmp rax, 0xA             ; Перевод строки - конец чтения слова
+    cmp rax, 0xA             
     je .end
     dec r13 ; уменьшаем размер буфера
-    cmp r13, 0 ;проверяем, не превышен ли размер буфера
+    cmp r13, 0 ; проверяем, не превышен ли размер буфера
     jbe .buffer_overflow
-    mov byte [r12], al ; символ в буфер
-    inc r12                  
+    mov byte [r12 + r14], al ; символ в буфер
+    inc r14                  
     call read_char ; считываем следующий символ
-    jmp .read_word_loop     
+    jmp .read_loop     
 .end:
     mov byte [r12], 0x0 ; добавляем нуль-терминант
+    mov rdx, r14 ; rdx = длина слова
+    mov rax, r12
     pop r13
     pop r12
-    mov rdi, [rsp] ; Загружаем rdi из стека
-    call string_length       ; Определяем длину считанного слова
-    mov rdx, rax ; rdx = длина слова
-    pop rax
-    ret                      ; Возвращаем результат
+    pop r14
+    ret                     
 .buffer_overflow:
     pop r13
     pop r12
-    xor rax, rax             ; Ошибка: возвращаем 0
+    pop r14
+    xor rax, rax            
     ret
-
 ; Принимает указатель на строку, пытается
 ; прочитать из её начала беззнаковое число.
 ; Возвращает в rax: число, rdx : его длину в символах
