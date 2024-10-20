@@ -124,13 +124,13 @@ string_equals:
 
 ; Читает один символ из stdin и возвращает его. Возвращает 0 если достигнут конец потока
 read_char:  
-    sub rsp, 1 ; выделяем место на стеке для символа
+    push 0  ; выделяем место на стеке для символа
     mov rdx, 1 ; длина
     mov rdi, 0 ; stdin (0)  
     mov rsi, rsp  
     mov rax, 0  
-    syscall                 
-    add rsp, 1               
+    syscall 
+    pop rax                               
     ret
 
 ; Принимает: адрес начала буфера, размер буфера
