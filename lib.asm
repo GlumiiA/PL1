@@ -143,42 +143,60 @@ read_char:
 ; При успехе возвращает адрес буфера в rax, длину слова в rdx.
 ; При неудаче возвращает 0 в rax
 ; Эта функция должна дописывать к слову нуль-терминатор
-read_word:
-    mov r12, rdi ; адрес начала буфера
-    mov r13, rsi ; размер буфера
-    xor r10, r10
-    xor rcx, rcx ; длина слова
-    sub rsp, 8 ; 16
-    .loop_spaces:
-        push rdi
-        push rdx
-        call read_char ; читаем символ
-        pop rdx
-        pop rdi     
-        cmp r10b, 0x0      
-        je .end
-        cmp r10b, 0x20
-        je .loop_spaces
-        cmp r10b, 0x9   
-        je .loop_spaces
-        cmp r10b, 0xA
-        je .loop_spaces
-        inc rcx ; увеличиваем длину на 1
-        cmp rcx, r13 ; проверяем, не превышен ли размер буфера
-        jbe .word_bigger
-        mov [rdi + rcx], r10b
-        jmp .loop_spaces
-    .end:
-        inc rcx
-        cmp rcx, r13 ; проверяем, не превышен ли размер буфера
-        jbe .word_bigger
-        mov byte [rdi + rcx], 0   ; Добавляем нуль-терминатор
-        mov rdx, rcx         ; rdx = длина слова
-        mov rax, rdi       
-        ret
-    .word_bigger:
-        xor rax, rax          ; Ошибка: установка rax в 0
-        ret
+read_word: 
+test rsi, rsi 
+je .bad_end 
+.skip_loop: 
+push rdi ; saving caller-saved registers 
+push rsi 
+sub rsp, 8 ; respect conventions 
+call read_char 
+add rsp, 8 
+pop rsi 
+pop rdi 
+cmp rax, ' ' 
+je .skip_loop 
+cmp rax, \t 
+je .skip_loop 
+cmp rax, \n 
+je .skip_loop 
+xor rcx, rcx ; rcx must be zero if next condition is true 
+test rax, rax ; if rax == eof 
+je .good_end 
+cmp rsi, 1 
+je .bad_end ; if rsi == 1 then there is no space for null terminator 
+mov byte[rdi], al 
+inc rcx 
+dec rsi ; not forgetting about null terminator 
+.read_loop: 
+cmp rcx, rsi ; if rcx >= rsi then there is no space for null terminator 
+jge .bad_end 
+push rcx 
+push rdi 
+push rsi 
+call read_char 
+pop rsi 
+pop rdi 
+pop rcx 
+cmp rax, ' ' ; if it's space symbol then the word has ended 
+je .good_end 
+cmp rax, \t 
+je .good_end 
+cmp rax, \n 
+je .good_end 
+test rax, rax 
+je .good_end 
+mov byte[rdi + rcx], al ; saving char into buf 
+inc rcx 
+jmp .read_loop 
+.good_end: 
+mov byte[rdi + rcx], 0 ; null terminator 
+mov rax, rdi ; address 
+mov rdx, rcx ; size 
+ret 
+.bad_end: 
+xor rax, rax 
+ret
 
 
 ; Принимает указатель на строку, пытается
