@@ -164,13 +164,13 @@ read_word:
         cmp r10b, 0xA
         je .loop_spaces
         inc rcx ; увеличиваем длину на 1
-        cmp rсx, r13 ; проверяем, не превышен ли размер буфера
+        cmp rcx, r13 ; проверяем, не превышен ли размер буфера
         jbe .word_bigger
         mov [rdi + rcx], r10b
         jmp .loop_spaces
     .end:
         inc rcx
-        cmp rсx, r13 ; проверяем, не превышен ли размер буфера
+        cmp rcx, r13 ; проверяем, не превышен ли размер буфера
         jbe .word_bigger
         mov byte [rdi + rcx], 0   ; Добавляем нуль-терминатор
         mov rdx, rcx         ; rdx = длина слова
