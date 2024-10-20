@@ -156,9 +156,9 @@ pop rsi
 pop rdi 
 cmp rax, ' ' 
 je .skip_loop 
-cmp rax, \t 
+cmp rax, '\t' 
 je .skip_loop 
-cmp rax, \n 
+cmp rax, '\n' 
 je .skip_loop 
 xor rcx, rcx ; rcx must be zero if next condition is true 
 test rax, rax ; if rax == eof 
@@ -180,9 +180,9 @@ pop rdi
 pop rcx 
 cmp rax, ' ' ; if it's space symbol then the word has ended 
 je .good_end 
-cmp rax, \t 
+cmp rax, '\t' 
 je .good_end 
-cmp rax, \n 
+cmp rax, '\n' 
 je .good_end 
 test rax, rax 
 je .good_end 
