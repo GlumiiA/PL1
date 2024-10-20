@@ -263,7 +263,7 @@ string_copy:
         inc rcx 
         inc rsi
         inc rdi
-        tets al, al ; проверяем на нуль-термининант
+        test al, al ; проверяем на нуль-термининант
         jz .end
         jmp .loop_string
     .end_null:
