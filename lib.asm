@@ -132,8 +132,7 @@ read_char:
     mov rdx, 1
     syscall
     mov al, [rsp] ; прочитанный символ в al                    
-    pop rdi
-    add rsp, 1               
+    pop rdi               
     ret
 
 ; Принимает: адрес начала буфера, размер буфера
