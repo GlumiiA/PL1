@@ -157,36 +157,34 @@ read_word:
         cmp al, 0x9  ; пропускаем табуляцию
         je .loop_spaces  
         cmp al, 0xA ; пропускаем перевод строки
-        je .loop_spaces      
-    .read_loop:
-        cmp r14, r13 ; проверяем, не превышен ли размер буфера
-        jge .buffer_overflow
-        mov byte [r12 + r14], al ; символ в буфер
-        inc r14                  
-        call read_char ; считываем следующий символ
-        cmp al, 0x0 ; проверяем на нуль-терминант
-        je .end
-        cmp al, 0x20         
-        je .end
-        cmp al, 0x9             
-        je .end
-        cmp al, 0xA             
-        je .end
-        jmp .read_loop     
-    .end:
-        mov byte [r12], 0x0 ; добавляем нуль-терминант
-        mov rdx, r14 ; rdx = длина слова
+        je .loop_spaces    
+    .loop_spaces:
+        cmp r14, r13   ; проверка, что не overflow
+        jge .fail
+        mov byte [r12 + r14], al; перемещаем символ в буффер
+        inc r14
+        call read_char
+        cmp al, 0x20
+        je .end_of_word
+        cmp al, 0x9
+        je .end_of_word
+        cmp al, 0xA 
+        je .end_of_word
+        test al, al    ; проверка на конец стрима
+        jz .end_of_word
+        jmp .loop_spaces
+    .end_of_word:
+        mov byte [r12 + r14], 0 ; добавляем 0-терминатор в конец слова
+        mov rdx, r14
         mov rax, r12
-        pop r14
-        pop r13
-        pop r12
-        ret                     
+        jmp .end
     .buffer_overflow:
-        pop r14
-        pop r13
-        pop r12
         xor rdx, rdx
         xor rax, rax            
+    .end:
+        pop r14
+        pop r13
+        pop r12
         ret
 
 ; Принимает указатель на строку, пытается
