@@ -147,26 +147,24 @@ read_word:
     mov r12, rdi ; адрес начала буфера
     mov r13, rsi ; размер буфера
     xor r14, r14 ; Длина буфера
-    test r13, r13            ; Проверяем, пустой ли буфер
-    jz .buffer_overflow
     .loop_spaces:
         call read_char ; читаем символ 
         test al, al            
         jz .buffer_overflow
-        cmp rax, 0x20 ; пропускаем, если пробел
+        cmp al, 0x20 ; пропускаем, если пробел
         je .loop_spaces 
-        cmp rax, 0x9  ; пропускаем табуляцию
+        cmp al, 0x9  ; пропускаем табуляцию
         je .loop_spaces  
-        cmp rax, 0xA ; пропускаем перевод строки
+        cmp al, 0xA ; пропускаем перевод строки
         je .loop_spaces      
     .read_loop:
-        cmp rax, 0x0 ; проверяем на нуль-терминант
+        cmp al, 0x0 ; проверяем на нуль-терминант
         je .end
-        cmp rax, 0x20         
+        cmp al, 0x20         
         je .end
-        cmp rax, 0x9             
+        cmp al, 0x9             
         je .end
-        cmp rax, 0xA             
+        cmp al, 0xA             
         je .end
         dec r13 ; уменьшаем размер буфера
         cmp r13, 0 ; проверяем, не превышен ли размер буфера
