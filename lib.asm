@@ -159,35 +159,35 @@ read_word:
         cmp al, 0xA ; пропускаем перевод строки
         je .loop_spaces    
     .read:
-        cmp r14, r13   ; проверка, что не overflow
+        cmp r14, r13   ; проверяем, не превышен ли размер буфера
         jge .buffer_overflow
         mov byte [r12 + r14], al; перемещаем символ в буффер
         inc r14
         call read_char
         cmp al, 0x20
-        je .end_of_word
+        je .end
         cmp al, 0x9
-        je .end_of_word
+        je .end
         cmp al, 0xA 
-        je .end_of_word
-        test al, al    ; проверка на конец стрима
-        jz .end_of_word
+        je .end
+        test al, al    ; проверка на конец
+        jz .end
         jmp .read
-    .end_of_word:
-        mov byte [r12 + r14], 0 ; добавляем 0-терминатор в конец слова
-        mov rdx, r14
-        mov rax, r12
-        jmp .end
-  
-    .buffer_overflow:
-        xor rdx, rdx
-        xor rax, rax            
-  
     .end:
+        mov byte [r12 + r14], 0 ; добавляем нуль-терминант
+        mov rdx, r14 ; rdx = длина слова
+        mov rax, r12
         pop r14
         pop r13
         pop r12
         ret
+    .buffer_overflow:
+        xor rdx, rdx
+        xor rax, rax 
+        pop r14
+        pop r13
+        pop r12
+        ret   
 
 ; Принимает указатель на строку, пытается
 ; прочитать из её начала беззнаковое число.
