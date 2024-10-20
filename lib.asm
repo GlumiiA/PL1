@@ -145,37 +145,37 @@ read_word:
     mov r13, rsi ; размер буфера
     xor r10, r10
     xor rcx, rcx ; длина слова
+    test r13, r13            ; Проверяем, пустой ли буфер
+    jz .buffer_overflow
     sub rsp, 8 ; 16
     .loop_spaces:
-        push rdi
-        push rdx
-        call read_char ; читаем символ
-        pop rdx
-        pop rdi     
-        cmp r10b, 0x0      
+        call read_char ; читаем символ     
+        cmp rax, 0x0      
         je .end
-        cmp r10b, 0x20
+        cmp rax, 0x20
         je .loop_spaces
-        cmp r10b, 0x9   
+        cmp rax, 0x9   
         je .loop_spaces
-        cmp r10b, 0xA
+        cmp rax, 0xA
         je .loop_spaces
         inc rcx ; увеличиваем длину на 1
-        cmp rcx, r13 ; проверяем, не превышен ли размер буфера
-        jbe .word_bigger
+        cmp r13, rcx ; проверяем, не превышен ли размер буфера
+        jb .buffer_overflow
         mov [rdi + rcx], r10b
         jmp .loop_spaces
     .end:
         inc rcx
-        cmp rcx, r13 ; проверяем, не превышен ли размер буфера
-        jbe .word_bigger
-        mov byte [rdi + rcx], 0   ; Добавляем нуль-терминатор
+        cmp r13, rcx ; проверяем, не превышен ли размер буфера
+        jbe .buffer_overflow
+        mov byte [rdi + rcx], 0x0   ; Добавляем нуль-терминатор
         mov rdx, rcx        ; rdx = длина слова
-        mov rax, rdi       
+        mov rax, rdi  
+        add rsp, 8     
         ret
-    .word_bigger:
+    .buffer_overflow:
         xor rax, rax          ; Ошибка: установка rax в 0
         ret
+
 
 
 ; Принимает указатель на строку, пытается
