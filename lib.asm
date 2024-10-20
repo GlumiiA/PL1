@@ -144,46 +144,40 @@ read_char:
 ; При неудаче возвращает 0 в rax
 ; Эта функция должна дописывать к слову нуль-терминатор
 read_word:
-    push rdi 
-    push rsi
-    mov rcx, 0
-    mov rbx, rsi
-;    mov rcx, 0
-    test rbx, rsi
-    jz .word_bigger
+    mov r12, rdi ; адрес начала буфера
+    mov r13, rsi ; размер буфера
+    xor r10, r10
+    xor rcx, rcx ; длина слова
+    sub rsp, 8 ; 16
     .loop_spaces:
-	sub rsp, 8
-        call read_char
-	add rsp, 8      
-        cmp rax, 0x0          
+        push rdi
+        push rdx
+        call read_char ; читаем символ
+        pop rdx
+        pop rdi     
+        cmp r10b, 0x0      
         je .end
-        cmp rax, 0x20
+        cmp r10b, 0x20
         je .loop_spaces
-        cmp rax, 0x9   
+        cmp r10b, 0x9   
         je .loop_spaces
-        cmp rax, 0xA
+        cmp r10b, 0xA
         je .loop_spaces
-        dec rbx
-        cmp rbx, 0          ; проверяем, не превышен ли размер буфера
+        inc rcx ; увеличиваем длину на 1
+        cmp rсx, r13 ; проверяем, не превышен ли размер буфера
         jbe .word_bigger
-        mov [rdi + rcx], al
-        inc rcx ; Увеличиваем длину слова
+        mov [rdi + rcx], r10b
         jmp .loop_spaces
-
     .end:
-        dec rbx
-        cmp rbx, 0          ; проверяем, не превышен ли размер буфера
+        inc rcx
+        cmp rсx, r13 ; проверяем, не превышен ли размер буфера
         jbe .word_bigger
         mov byte [rdi + rcx], 0   ; Добавляем нуль-терминатор
         mov rdx, rcx         ; rdx = длина слова
         mov rax, rdi       
-        pop rsi
-        pop rdi
         ret
     .word_bigger:
         xor rax, rax          ; Ошибка: установка rax в 0
-        pop rsi
-        pop rdi
         ret
 
 
