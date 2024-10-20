@@ -143,60 +143,53 @@ read_char:
 ; При успехе возвращает адрес буфера в rax, длину слова в rdx.
 ; При неудаче возвращает 0 в rax
 ; Эта функция должна дописывать к слову нуль-терминатор
-read_word: 
-test rsi, rsi 
-je .bad_end 
-.skip_loop: 
-push rdi ; saving caller-saved registers 
-push rsi 
-sub rsp, 8 ; respect conventions 
-call read_char 
-add rsp, 8 
-pop rsi 
-pop rdi 
-cmp rax, ' ' 
-je .skip_loop 
-cmp rax, '\t' 
-je .skip_loop 
-cmp rax, '\n' 
-je .skip_loop 
-xor rcx, rcx ; rcx must be zero if next condition is true 
-test rax, rax ; if rax == eof 
-je .good_end 
-cmp rsi, 1 
-je .bad_end ; if rsi == 1 then there is no space for null terminator 
-mov byte[rdi], al 
-inc rcx 
-dec rsi ; not forgetting about null terminator 
-.read_loop: 
-cmp rcx, rsi ; if rcx >= rsi then there is no space for null terminator 
-jge .bad_end 
-push rcx 
-push rdi 
-push rsi 
-call read_char 
-pop rsi 
-pop rdi 
-pop rcx 
-cmp rax, ' ' ; if it's space symbol then the word has ended 
-je .good_end 
-cmp rax, '\t' 
-je .good_end 
-cmp rax, '\n' 
-je .good_end 
-test rax, rax 
-je .good_end 
-mov byte[rdi + rcx], al ; saving char into buf 
-inc rcx 
-jmp .read_loop 
-.good_end: 
-mov byte[rdi + rcx], 0 ; null terminator 
-mov rax, rdi ; address 
-mov rdx, rcx ; size 
-ret 
-.bad_end: 
-xor rax, rax 
-ret
+read_word:
+    push rdi                 ; Сохраняем начальный адрес буфера
+    push r12                 ; Сохраняем регистр r12 (callee-saved)
+    mov r12, rdi             ; r12: текущий адрес буфера
+    push r13                 ; Сохраняем регистр r13 (callee-saved)
+    mov r13, rsi             ; r13: текущий размер буфера
+    test r13, r13            ; Проверяем, пустой ли буфер
+    jz .buffer_too_small     ; Если да, буфер слишком мал
+.skip_whitespace:
+    call read_char           ; Считываем символ
+    cmp rax, 0x20            ; Пробел?
+    je .skip_whitespace      ; Пропускаем, если пробел
+    cmp rax, 0x9             ; Табуляция?
+    je .skip_whitespace      ; Пропускаем, если табуляция
+    cmp rax, 0xA             ; Перевод строки?
+    je .skip_whitespace      ; Пропускаем, если перевод строки
+.read_word_loop:
+    cmp rax, 0x0             ; Нуль-терминатор - конец чтения
+    je .complete_read
+    cmp rax, 0x20            ; Пробел - конец чтения слова
+    je .complete_read
+    cmp rax, 0x9             ; Табуляция - конец чтения слова
+    je .complete_read
+    cmp rax, 0xA             ; Перевод строки - конец чтения слова
+    je .complete_read
+    dec r13                  ; Уменьшаем оставшийся размер буфера
+    cmp r13, 0               ; Проверяем, не переполнен ли буфер
+    jbe .buffer_too_small    ; Если буфер переполнен, ошибка
+    mov byte [r12], al       ; Записываем символ в буфер
+    inc r12                  ; Переходим к следующей позиции в буфере
+    call read_char           ; Считываем следующий символ
+    jmp .read_word_loop      ; Продолжаем цикл чтения
+.complete_read:
+    mov byte [r12], 0x0      ; Добавляем нуль-терминатор в конце слова
+    pop r13
+    pop r12
+    mov rdi, [rsp]           ; Загружаем rdi из стека
+    call string_length       ; Определяем длину считанного слова
+    mov rdx, rax             ; Длина слова сохраняется в rdx
+    pop rax
+    ret                      ; Возвращаем результат
+.buffer_too_small:
+    pop r13
+    pop r12
+    pop rdi
+    xor rax, rax             ; Ошибка: возвращаем 0
+    ret
 
 
 ; Принимает указатель на строку, пытается
