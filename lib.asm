@@ -158,6 +158,11 @@ read_word:
         cmp al, 0xA ; пропускаем перевод строки
         je .loop_spaces      
     .read_loop:
+        cmp r14, r13 ; проверяем, не превышен ли размер буфера
+        jge .buffer_overflow
+        mov byte [r12 + r14], al ; символ в буфер
+        inc r14                  
+        call read_char ; считываем следующий символ
         cmp al, 0x0 ; проверяем на нуль-терминант
         je .end
         cmp al, 0x20         
@@ -166,12 +171,6 @@ read_word:
         je .end
         cmp al, 0xA             
         je .end
-        dec r13 ; уменьшаем размер буфера
-        cmp r13, 0 ; проверяем, не превышен ли размер буфера
-        jbe .buffer_overflow
-        mov byte [r12 + r14], al ; символ в буфер
-        inc r14                  
-        call read_char ; считываем следующий символ
         jmp .read_loop     
     .end:
         mov byte [r12], 0x0 ; добавляем нуль-терминант
