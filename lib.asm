@@ -141,52 +141,41 @@ read_char:
 ; При неудаче возвращает 0 в rax
 ; Эта функция должна дописывать к слову нуль-терминатор
 read_word:
-    push rdi                 ; Сохраняем начальный адрес буфера
-    push r12                 ; Сохраняем регистр r12 (callee-saved)
-    mov r12, rdi             ; r12: текущий адрес буфера
-    push r13                 ; Сохраняем регистр r13 (callee-saved)
-    mov r13, rsi             ; r13: текущий размер буфера
-    test r13, r13            ; Проверяем, пустой ли буфер
-    jz .buffer_too_small     ; Если да, буфер слишком мал
-.skip_whitespace:
-    call read_char           ; Считываем символ
-    cmp rax, 0x20            ; Пробел?
-    je .skip_whitespace      ; Пропускаем, если пробел
-    cmp rax, 0x9             ; Табуляция?
-    je .skip_whitespace      ; Пропускаем, если табуляция
-    cmp rax, 0xA             ; Перевод строки?
-    je .skip_whitespace      ; Пропускаем, если перевод строки
-.read_word_loop:
-    cmp rax, 0x0             ; Нуль-терминатор - конец чтения
-    je .complete_read
-    cmp rax, 0x20            ; Пробел - конец чтения слова
-    je .complete_read
-    cmp rax, 0x9             ; Табуляция - конец чтения слова
-    je .complete_read
-    cmp rax, 0xA             ; Перевод строки - конец чтения слова
-    je .complete_read
-    dec r13                  ; Уменьшаем оставшийся размер буфера
-    cmp r13, 0               ; Проверяем, не переполнен ли буфер
-    jbe .buffer_too_small    ; Если буфер переполнен, ошибка
-    mov byte [r12], al       ; Записываем символ в буфер
-    inc r12                  ; Переходим к следующей позиции в буфере
-    call read_char           ; Считываем следующий символ
-    jmp .read_word_loop      ; Продолжаем цикл чтения
-.complete_read:
-    mov byte [r12], 0x0      ; Добавляем нуль-терминатор в конце слова
-    pop r13
-    pop r12
-    mov rdi, [rsp]           ; Загружаем rdi из стека
-    call string_length       ; Определяем длину считанного слова
-    mov rdx, rax             ; Длина слова сохраняется в rdx
-    pop rax
-    ret                      ; Возвращаем результат
-.buffer_too_small:
-    pop r13
-    pop r12
-    pop rdi
-    xor rax, rax             ; Ошибка: возвращаем 0
-    ret
+    mov r12, rdi ; адрес начала буфера
+    mov r13, rsi ; размер буфера
+    xor r10, r10
+    xor rcx, rcx ; длина слова
+    sub rsp, 8 ; 16
+    .loop_spaces:
+        push rdi
+        push rdx
+        call read_char ; читаем символ
+        pop rdx
+        pop rdi     
+        cmp r10b, 0x0      
+        je .end
+        cmp r10b, 0x20
+        je .loop_spaces
+        cmp r10b, 0x9   
+        je .loop_spaces
+        cmp r10b, 0xA
+        je .loop_spaces
+        inc rcx ; увеличиваем длину на 1
+        cmp rcx, r13 ; проверяем, не превышен ли размер буфера
+        jbe .word_bigger
+        mov [rdi + rcx], r10b
+        jmp .loop_spaces
+    .end:
+        inc rcx
+        cmp rcx, r13 ; проверяем, не превышен ли размер буфера
+        jbe .word_bigger
+        mov byte [rdi + rcx], 0   ; Добавляем нуль-терминатор
+        mov rdx, rcx        ; rdx = длина слова
+        mov rax, rdi       
+        ret
+    .word_bigger:
+        xor rax, rax          ; Ошибка: установка rax в 0
+        ret
 
 
 ; Принимает указатель на строку, пытается
