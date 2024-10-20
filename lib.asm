@@ -141,49 +141,50 @@ read_char:
 ; При неудаче возвращает 0 в rax
 ; Эта функция должна дописывать к слову нуль-терминатор
 read_word:
-    push r12 ; 16
-    push r13 ; 8
+    push r13 ; 16
+    push r12 ; 8
     mov r12, rdi ; адрес начала буфера
-    mov r13, rsi ; размер буфера
-    xor r10, r10
-    xor rcx, rcx ; длина слова
+    mov r13, rsi             ; размер буфера
     test r13, r13            ; Проверяем, пустой ли буфер
-    jz .buffer_overflow
-    sub rsp, 8 ; 16 выравниваем стек
-    .loop_spaces:
-        call read_char ; читаем символ     
-        cmp rax, 0x20 ; пропускаем пробел
-        je .loop_spaces
-        cmp rax, 0x9  ; пропускаем табуляцию
-        je .loop_spaces
-        cmp rax, 0xA  ; пропускаем перевод строки
-        je .loop_spaces
-    .read:
-        cmp rax, 0 ; проверяем на нуль-терминант
-        je .end
-        inc rcx ; увеличиваем длину на 1
-        cmp r13, rcx ; проверяем, не превышен ли размер буфера
-        jb .buffer_overflow
-        mov byte [r12], r10b ; символ в буфер
-        inc r12
-        call read_char
-        jmp .loop_spaces
-    .end:
-        mov byte [r12], 0x0   ; Добавляем нуль-терминатор
-        mov rdx, rcx        ; rdx = длина слова
-        mov rax, rdi  
-        pop r12
-        pop r13
-        add rsp, 8     
-        ret
-    .buffer_overflow:
-        pop r12
-        pop r13
-        add rsp, 8
-        xor rax, rax          ; Ошибка: установка rax в 0
-        ret
-
-
+    jz .buffer_overflow     ; Если да, буфер слишком мал
+.loop_spaces:
+    call read_char ; читаем символ  
+    cmp rax, 0x20 ; пропускаем, если пробел
+    je .loop_spaces 
+    cmp rax, 0x9  ; пропускаем табуляцию
+    je .loop_spaces  
+    cmp rax, 0xA ; пропускаем перевод строки
+    je .loop_spaces      
+.read_word_loop:
+    cmp rax, 0x0 ; проверяем на нуль-терминант
+    je .end
+    cmp rax, 0x20            ; Пробел - конец чтения слова
+    je .end
+    cmp rax, 0x9             ; Табуляция - конец чтения слова
+    je .end
+    cmp rax, 0xA             ; Перевод строки - конец чтения слова
+    je .end
+    dec r13 ; уменьшаем размер буфера
+    cmp r13, 0 ;проверяем, не превышен ли размер буфера
+    jbe .buffer_overflow
+    mov byte [r12], al ; символ в буфер
+    inc r12                  
+    call read_char ; считываем следующий символ
+    jmp .read_word_loop     
+.end:
+    mov byte [r12], 0x0 ; добавляем нуль-терминант
+    pop r13
+    pop r12
+    mov rdi, [rsp] ; Загружаем rdi из стека
+    call string_length       ; Определяем длину считанного слова
+    mov rdx, rax ; rdx = длина слова
+    pop rax
+    ret                      ; Возвращаем результат
+.buffer_overflow:
+    pop r13
+    pop r12
+    xor rax, rax             ; Ошибка: возвращаем 0
+    ret
 
 ; Принимает указатель на строку, пытается
 ; прочитать из её начала беззнаковое число.
