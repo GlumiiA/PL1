@@ -1,24 +1,10 @@
 section .text
-global exit
-global string_length
-global print_string
-global print_string_error
-global print_char
-global print_newline
-global print_uint
-global print_int
-global string_equals
-global read_char
-global read_word
-global read_string
-global parse_uint
-global parse_int
-global string_copy
+ 
  
 ; Принимает код возврата и завершает текущий процесс
 exit:
     xor rax, rax
-    mov     rax, 60                         ; номер системного вызова 'exit'    
+    mov     rax, 60                         ; номер системного вызова 'exit'
     syscall 
 
 ; Принимает указатель на нуль-терминированную строку, возвращает её длину
@@ -99,14 +85,18 @@ print_uint:
 ; Выводит знаковое 8-байтовое число в десятичном формате 
 print_int:
     sub rsp, 8 ; выравниваем стек
-    test rdi, rdi ; проверяем на знак
+    mov rax, rdi
+    test rax, rax ; проверяем на знак
     jge .positive 
-    neg rdi   ; если отрицательный
+    neg rax   ; если отрицательный
+    push rax 
     push rdi  
     mov rdi, '-'
     call print_char
     pop rdi
+    pop rax
     .positive:
+        mov rdi, rax
         call print_uint
         add rsp, 8 
         ret
@@ -133,7 +123,7 @@ string_equals:
 
 ; Читает один символ из stdin и возвращает его. Возвращает 0 если достигнут конец потока
 read_char:  
-    push 0  ; выделяем место на стеке для символа
+    push 0  ; выделяем место на стеке
     mov rdx, 1 ; длина
     mov rdi, 0 ; stdin (0)  
     mov rsi, rsp  
@@ -194,7 +184,7 @@ read_word:
         pop r14
         pop r13
         pop r12
-        ret   
+        ret    
 
 ; Принимает указатель на строку, пытается
 ; прочитать из её начала беззнаковое число.
@@ -250,20 +240,25 @@ parse_int:
         sub rsp, 8 ; 16
         call parse_uint
         add rsp, 8
+        test rdx, rdx
+        jmp .err
         neg rax
         inc rdx ; увеличиваем длину на 1
-    .end: 
-        ret
     .endnull:
         xor rax, rax
         mov rdx, 1
-        ret  
+        ret
+    .err:
+        xor rzx, rax
+    .end: 
+        ret
 
 ; Принимает указатель на строку, указатель на буфер и длину буфера
 ; Копирует строку в буфер
 ; Возвращает длину строки если она умещается в буфер, иначе 0
 string_copy:
     ; rdi rsi rdx указатели на строку, буфер, длину буфера
+    xor rax, rax
     xor rcx, rcx    ; счётчик  
     .loop_string: 
         cmp rcx, rdx 
@@ -280,4 +275,3 @@ string_copy:
         xor rax, rax 
     .end: 
         ret
-
