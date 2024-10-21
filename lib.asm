@@ -1,11 +1,24 @@
 section .text
- 
+global exit
+global string_length
+global print_string
+global print_string_error
+global print_char
+global print_newline
+global print_uint
+global print_int
+global string_equals
+global read_char
+global read_word
+global read_string
+global parse_uint
+global parse_int
+global string_copy
  
 ; Принимает код возврата и завершает текущий процесс
 exit:
     xor rax, rax
-    mov     rax, 60                         ; номер системного вызова 'exit'
-    xor     rdi, rdi    
+    mov     rax, 60                         ; номер системного вызова 'exit'    
     syscall 
 
 ; Принимает указатель на нуль-терминированную строку, возвращает её длину
@@ -21,7 +34,7 @@ string_length:
 
 ; Принимает указатель на нуль-терминированную строку, выводит её в stdout
 print_string:
-    push rdi ; 
+    push rdi 
     call string_length 
     pop rdi;
     mov rsi, rdi
@@ -38,7 +51,7 @@ print_char:
     mov rsi, rsp        
     mov rdx, 1
     mov rax, 1 ; write
-    mov rdi, 1   ; stdout 
+    mov rdi, 1 ; stdout 
     syscall
     pop rdi
 
@@ -86,18 +99,14 @@ print_uint:
 ; Выводит знаковое 8-байтовое число в десятичном формате 
 print_int:
     sub rsp, 8 ; выравниваем стек
-    mov rax, rdi
-    test rax, rax ; проверяем на знак
+    test rdi, rdi ; проверяем на знак
     jge .positive 
-    neg rax   ; если отрицательный
-    push rax 
+    neg rdi   ; если отрицательный
     push rdi  
     mov rdi, '-'
     call print_char
     pop rdi
-    pop rax
     .positive:
-        mov rdi, rax
         call print_uint
         add rsp, 8 
         ret
@@ -146,7 +155,7 @@ read_word:
     push r14 ; 16
     mov r12, rdi ; адрес начала буфера
     mov r13, rsi ; размер буфера
-    xor r14, r14 ; Длина буфера
+    xor r14, r14 ; длина слова
     dec r13 ; резервируем место для нуль-терминанта
     .loop_spaces:
         call read_char ; читаем символ 
@@ -177,13 +186,11 @@ read_word:
         mov byte [r12 + r14], 0 ; добавляем нуль-терминант
         mov rdx, r14 ; rdx = длина слова
         mov rax, r12
-        pop r14
-        pop r13
-        pop r12
-        ret
+        jmp .finally
     .buffer_overflow:
         xor rdx, rdx
         xor rax, rax 
+    .finally
         pop r14
         pop r13
         pop r12
@@ -257,7 +264,6 @@ parse_int:
 ; Возвращает длину строки если она умещается в буфер, иначе 0
 string_copy:
     ; rdi rsi rdx указатели на строку, буфер, длину буфера
-    xor rax, rax
     xor rcx, rcx    ; счётчик  
     .loop_string: 
         cmp rcx, rdx 
