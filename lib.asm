@@ -199,7 +199,7 @@ parse_uint:
         mov r10b, byte [rdi + r9] ; байт из строки  
         sub r10b, '0' ; преобразование ASCII в число
         cmp r10b, 0                
-        jl .end                    
+        jle .end                    
         cmp r10b, 9            
         ja .end ; Если больше 9, выходим
         ; Умножаем текущее значение на 10
