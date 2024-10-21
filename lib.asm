@@ -85,14 +85,18 @@ print_uint:
 ; Выводит знаковое 8-байтовое число в десятичном формате 
 print_int:
     sub rsp, 8 ; выравниваем стек
-    test rdi, rdi ; проверяем на знак
+    mov rax, rdi
+    test rax, rax ; проверяем на знак
     jge .positive 
-    neg rdi   ; если отрицательный
+    neg rax   ; если отрицательный
+    push rax 
     push rdi  
     mov rdi, '-'
     call print_char
     pop rdi
+    pop rax
     .positive:
+        mov rdi, rax
         call print_uint
         add rsp, 8 
         ret
@@ -236,18 +240,14 @@ parse_int:
         sub rsp, 8 ; 16
         call parse_uint
         add rsp, 8
-        test rdx, rdx
-        jz .err
         neg rax
         inc rdx ; увеличиваем длину на 1
+    .end: 
+        ret
     .endnull:
         xor rax, rax
         mov rdx, 1
-        ret
-    .err:
-        xor rax, rax
-    .end: 
-        ret
+        ret  
 
 ; Принимает указатель на строку, указатель на буфер и длину буфера
 ; Копирует строку в буфер
