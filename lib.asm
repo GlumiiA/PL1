@@ -220,19 +220,17 @@ parse_uint:
 ; Если есть знак, пробелы между ним и числом не разрешены.
 ; Возвращает в rax: число, rdx : его длину в символах (включая знак, если он был) 
 ; rdx = 0 если число прочитать не удалось
-parse_int:
-    sub rsp, 8 ; выравниваем стек
-    test rdi, rdi ; проверяем на знак
-    jge .positive 
-    neg rdi   ; если отрицательный
-    push rdi  
-    mov rdi, '-'
-    call print_char
-    pop rdi
+parse_int:         
+    xor rdx, rdx ;       
+    cmp byte [rdi], '-'   
+    je .negative 
+    cmp byte [rdi], 0    
+    je .endnull     
     .positive:
-        call print_uint
-        add rsp, 8 
-        jmp .end            
+        sub rsp, 8 ; 16
+        call parse_uint
+        add rsp, 8
+        jmp .end             
     .negative:
         inc rdi ; переходим на следующий символ
         sub rsp, 8 ; 16
