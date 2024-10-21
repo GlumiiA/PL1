@@ -236,7 +236,7 @@ print_int:
     .positive:
         call print_uint
         add rsp, 8 
-        .end            
+        jmp .end            
     .negative:
         inc rdi ; переходим на следующий символ
         sub rsp, 8 ; 16
