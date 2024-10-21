@@ -241,7 +241,7 @@ parse_int:
         call parse_uint
         add rsp, 8
         test rdx, rdx
-        jmp .err
+        jz .err
         neg rax
         inc rdx ; увеличиваем длину на 1
     .endnull:
