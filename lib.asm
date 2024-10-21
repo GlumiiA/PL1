@@ -249,7 +249,7 @@ parse_int:
         mov rdx, 1
         ret
     .err:
-        xor rzx, rax
+        xor rax, rax
     .end: 
         ret
 
